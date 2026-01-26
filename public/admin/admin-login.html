@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 로그인</title>
+  <meta name="woojin-api-base" content="https://gaoninterior.kr/api" />
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #f3f4f6;
+      font-family: sans-serif;
+    }
+
+    .login-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 320px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      color: #1f2937;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-card">
+    <h1>관리자 로그인</h1>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="아이디" required />
+      <input type="password" id="password" placeholder="비밀번호" required />
+      <button type="submit">로그인</button>
+    </form>
+  </div>
+
+  <script src="/src/common.js"></script>
+  <script>
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        // 주의: 백엔드 로그인 API 주소가 /users/login 인지 /auth/login 인지 확인이 필요합니다.
+        // 보통 많이 쓰는 /users/login으로 작성했습니다. 만약 404 에러가 나면 백엔드 라우터를 확인해주세요.
+        const res = await window.apiFetch('/users/login', {
+          method: 'POST',
+          body: { username, password },
+        });
+
+        if (res.token) {
+          // 1. 토큰 저장 (가장 중요)
+          localStorage.setItem('token', res.token);
+          alert('로그인 성공!');
+
+          // 2. 프로젝트 관리 페이지로 이동
+          window.location.href = '/src/admin-projects.html';
+        } else {
+          alert('로그인 실패: 토큰을 받지 못했습니다.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('로그인 오류: ' + err.message);
+      }
+    });
+  </script>
+</body>
+
+</html>

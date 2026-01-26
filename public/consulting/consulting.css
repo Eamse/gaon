@@ -1,0 +1,221 @@
+/* consulting.css */
+:root {
+  --primary-color: #1a1a1a;
+  --accent-color: #c5a47e; /* 골드 */
+  --text-gray: #666;
+  --line-color: #e5e5e5;
+  --bg-light: #f9f9f9;
+}
+
+.consulting-main {
+  max-width: 900px; /* 폼은 너무 넓으면 집중도 떨어짐 */
+  margin: 120px auto 100px;
+  padding: 0 20px;
+}
+
+/* 헤더 */
+.page-header {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.page-header h1 {
+  font-size: 2.8rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  letter-spacing: -1px;
+}
+
+.page-header p {
+  color: var(--text-gray);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* 폼 컨테이너 */
+.form-container {
+  background: #fff;
+  padding: 50px;
+  border: 1px solid var(--line-color);
+  border-radius: 4px; /* 각진 느낌 유지 */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
+}
+
+/* 섹션 스타일 */
+.form-section {
+  margin-bottom: 50px;
+}
+
+.form-section h3 {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+}
+
+/* 입력 필드 레이아웃 */
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2열 배치 */
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.input-group label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.required {
+  color: var(--accent-color);
+}
+
+/* 인풋 박스 스타일 */
+input[type='text'],
+input[type='tel'],
+input[type='number'],
+input[type='date'],
+textarea {
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s;
+  background-color: #fcfcfc;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+textarea {
+  height: 150px;
+  resize: none;
+}
+
+/* ★ 라디오 버튼 커스텀 (버튼 모양으로 만들기) ★ */
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.radio-btn {
+  position: relative;
+  cursor: pointer;
+}
+
+/* 기본 라디오 숨기기 */
+.radio-btn input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* 내가 만든 버튼 모양 */
+.radio-btn span {
+  display: inline-block;
+  padding: 12px 24px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: var(--text-gray);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background-color: #fff;
+}
+
+/* 선택되었을 때 스타일 */
+.radio-btn input[type='radio']:checked + span {
+  background-color: var(--primary-color);
+  color: var(--accent-color); /* 글씨 골드 */
+  border-color: var(--primary-color);
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.radio-btn:hover span {
+  border-color: var(--accent-color);
+}
+
+/* 개인정보 동의 */
+.privacy-check {
+  text-align: center;
+  margin: 40px 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-color);
+}
+
+.privacy-check label {
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #555;
+  margin-left: 8px;
+}
+
+.privacy-check input[type='checkbox'] {
+  accent-color: var(--primary-color); /* 체크박스 색상 변경 */
+  transform: scale(1.2);
+}
+
+/* 제출 버튼 */
+.form-actions {
+  text-align: center;
+}
+
+.submit-btn {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 18px 60px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 250px;
+  letter-spacing: 1px;
+}
+
+.submit-btn:hover {
+  background-color: #333;
+  color: var(--accent-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .consulting-main {
+    margin-top: 100px;
+  }
+
+  .form-container {
+    padding: 25px; /* 모바일에서 패딩 줄임 */
+  }
+
+  .input-grid {
+    grid-template-columns: 1fr; /* 1줄로 */
+  }
+
+  .radio-btn span {
+    padding: 10px 15px; /* 버튼 크기 조절 */
+    font-size: 0.9rem;
+  }
+
+  .submit-btn {
+    width: 100%; /* 버튼 꽉 차게 */
+  }
+}

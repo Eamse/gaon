@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>가온 인테리어</title>
+  <link rel="stylesheet" href="/index.css" />
+  <link rel="stylesheet" href="/layout/layout.css" />
+  <link rel="stylesheet" href="/consulting/consulting.css" />
+  <script src="https://kit.fontawesome.com/0018d0d2c3.js" crossorigin="anonymous" defer></script>
+</head>
+
+<body>
+  <div id="layout-header"></div>
+  <main class="consulting-main">
+    <div class="page-header">
+      <h1>CONSULTING</h1>
+      <p>
+        고객님의 공간에 대한 꿈을 들려주세요.<br />
+        예산과 라이프스타일에 맞춘 최적의 플랜을 제안해 드립니다.
+      </p>
+    </div>
+
+    <div class="form-container">
+      <form id="consultingForm">
+        <section class="form-section">
+          <h3>01. 기본 정보</h3>
+          <div class="input-grid">
+            <div class="input-group">
+              <label for="userName">성함 <span class="required">*</span></label>
+              <input type="text" id="userName" name="userName" placeholder="홍길동" required />
+            </div>
+            <div class="input-group">
+              <label for="userPhone">연락처 <span class="required">*</span></label>
+              <input type="tel" id="userPhone" name="userPhone" placeholder="010-0000-0000" required />
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3>02. 현장 정보</h3>
+          <div class="input-group">
+            <label>공간 유형</label>
+            <div class="radio-group">
+              <label class="radio-btn">
+                <input type="radio" name="spaceType" value="apartment" checked />
+                <span>아파트</span>
+              </label>
+              <label class="radio-btn">
+                <input type="radio" name="spaceType" value="villa" />
+                <span>빌라/주택</span>
+              </label>
+              <label class="radio-btn">
+                <input type="radio" name="spaceType" value="commercial" />
+                <span>상업공간</span>
+              </label>
+              <label class="radio-btn">
+                <input type="radio" name="spaceType" value="etc" />
+                <span>기타</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="input-grid">
+            <div class="input-group">
+              <label for="areaSize">분양 평수 (평)</label>
+              <input type="number" id="areaSize" name="areaSize" placeholder="예: 32" />
+            </div>
+            <div class="input-group">
+              <label for="location">지역 (현장 위치)</label>
+              <input type="text" id="location" name="location" placeholder="예: 경기도 군포시 산본동" />
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3>03. 공사 내용</h3>
+          <div class="input-group">
+            <label>공사 범위</label>
+            <div class="radio-group">
+              <label class="radio-btn">
+                <input type="radio" name="scope" value="full" checked />
+                <span>전체 리모델링</span>
+              </label>
+              <label class="radio-btn">
+                <input type="radio" name="scope" value="partial" />
+                <span>부분 시공</span>
+              </label>
+              <label class="radio-btn">
+                <input type="radio" name="scope" value="window" />
+                <span>창호(샷시) 교체</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="input-grid">
+            <div class="input-group">
+              <label for="budget">예상 예산 (만원)</label>
+              <input type="text" id="budget" name="budget" placeholder="예: 4000" />
+            </div>
+            <div class="input-group">
+              <label for="schedule">공사 예정일</label>
+              <input type="date" id="schedule" name="schedule" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="requests">상세 요청사항</label>
+            <textarea id="requests" name="requests" placeholder="원하시는 스타일, 특별히 신경 써야 할 부분 등을 자유롭게 적어주세요."></textarea>
+          </div>
+        </section>
+
+        <div class="privacy-check">
+          <input type="checkbox" id="privacy" required />
+          <label for="privacy">
+            [필수] 개인정보 수집 및 이용에 동의합니다.
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="submit-btn">견적 신청하기</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <div id="layout-footer"></div>
+  <script src="/common.js" defer></script>
+  <script src="/consulting/consulting.js" defer></script>
+  <script src="/layout/layout.js" defer></script>
+  <script src="/index.js" defer></script>
+</body>
+
+</html>

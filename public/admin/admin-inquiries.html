@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>가온 인테리어 · 고객 문의 관리</title>
+  <link rel="stylesheet" href="/admin/admin-projects.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span style="color: #3b82f6">Gaon</span> Admin
+      </div>
+      <nav class="sidebar-menu">
+        <div class="menu-category">관리 메뉴</div>
+
+        <a href="/admin/dashboard.html" class="menu-item">
+          <i class="fas fa-chart-pie"></i> 대시보드
+        </a>
+
+        <a href="/admin/admin-projects.html" class="menu-item">
+          <i class="fas fa-hammer"></i> 현장/시공 관리
+        </a>
+
+        <a href="/admin/admin-gallery.html" class="menu-item">
+          <i class="fas fa-images"></i> 갤러리 관리
+        </a>
+
+        <a href="/admin/admin-inquiries.html" class="menu-item active">
+          <i class="fas fa-envelope-open-text"></i> 고객 문의 관리
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="window.logout()" type="button" class="btn-logout-sidebar">
+          <i class="fas fa-sign-out-alt"></i> 로그아웃
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content-wrapper">
+      <header class="header">
+        <div class="title">고객 문의 관리</div>
+        <div class="header-right">
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <span>관리자님</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="container">
+        <div class="page-header">
+          <h2>견적 문의 리스트</h2>
+          <p>홈페이지를 통해 접수된 고객 문의를 확인하고 관리합니다.</p>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">신규 문의</div>
+            <div class="stat-value text-blue" id="countNew">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">상담 진행중</div>
+            <div class="stat-value text-orange" id="countIng">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">이번 달 전체</div>
+            <div class="stat-value" id="countTotal">0</div>
+          </div>
+        </div>
+
+        <div class="list-section">
+          <div class="list-header-row">
+            <div class="form-title" style="margin-bottom: 0; border: none">
+              문의 내역
+            </div>
+            <div class="filter-group">
+              <button class="filter-btn danger" onclick="deleteSelected()">
+                선택 삭제
+              </button>
+              <button class="filter-btn active" onclick="filterInquiries('all')">
+                전체
+              </button>
+              <button class="filter-btn" onclick="filterInquiries('new')">
+                신규
+              </button>
+              <button class="filter-btn" onclick="filterInquiries('ing')">
+                상담중
+              </button>
+              <button class="filter-btn" onclick="filterInquiries('done')">
+                완료
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="inquiry-table">
+              <thead>
+                <tr>
+                  <th width="4%">
+                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this.checked)" />
+                  </th>
+                  <th width="5%">No</th>
+                  <th width="10%">상태</th>
+                  <th width="12%">접수일</th>
+                  <th width="12%">고객명</th>
+                  <th width="15%">연락처</th>
+                  <th width="15%">유형/평수</th>
+                  <th width="15%">예산</th>
+                  <th width="10%">관리</th>
+                </tr>
+              </thead>
+              <tbody id="inquiryTableBody">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 30px">
+                    데이터를 불러오는 중...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>문의 상세 정보</h3>
+        <button class="btn-close-modal" onclick="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4>01. 고객 정보</h4>
+          <div class="detail-row">
+            <span class="d-label">고객명</span>
+            <span class="d-value" id="m_userName">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">연락처</span>
+            <span class="d-value" id="m_userPhone">-</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>02. 현장 정보</h4>
+          <div class="detail-row">
+            <span class="d-label">공간 유형</span>
+            <span class="d-value" id="m_spaceInfo">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">현장 위치</span>
+            <span class="d-value" id="m_location">-</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>03. 공사 내용</h4>
+          <div class="detail-row">
+            <span class="d-label">공사 범위</span>
+            <span class="d-value" id="m_scope">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">예상 예산</span>
+            <span class="d-value" id="m_budget">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="d-label">희망 일정</span>
+            <span class="d-value" id="m_schedule">-</span>
+          </div>
+          <div class="detail-row column">
+            <span class="d-label">요청 사항</span>
+            <div class="d-box" id="m_requests"></div>
+          </div>
+        </div>
+
+        <div class="admin-action-area">
+          <h4><i class="fas fa-user-cog"></i> 관리자 메모 & 상태 변경</h4>
+          <div class="form-group">
+            <label>진행 상태</label>
+            <select id="m_statusSelect">
+              <option value="new">신규 문의</option>
+              <option value="ing">상담 진행중</option>
+              <option value="done">계약/완료</option>
+              <option value="cancel">취소/보류</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top: 10px">
+            <label>상담 메모</label>
+            <textarea id="m_adminMemo" placeholder="전화 상담 내용, 특이사항 등을 기록하세요."></textarea>
+          </div>
+          <button class="btn-save-modal" onclick="saveInquiryData()">
+            저장하기
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/common.js"></script>
+  <script src="/admin/admin-inquiries.js"></script>
+</body>
+
+</html>

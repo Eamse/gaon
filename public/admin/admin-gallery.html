@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>가온 인테리어 · 시공사례 갤러리</title>
+
+  <!-- API BASE -->
+  <meta name="woojin-api-base" content="https://gaoninterior.kr/api" />
+
+  <style>
+    /* --------------------------
+          기본 레이아웃 / 배경
+      --------------------------- */
+    :root {
+      --blue: #2d7dfc;
+      --blue-soft: #e3efff;
+      --bg: #f5f6f8;
+      --radius-card: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left,
+          rgba(90, 164, 255, 0.18),
+          transparent 55%),
+        #f5f6f8;
+      font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', system-ui,
+        sans-serif;
+      color: #111827;
+    }
+
+    .gallery-main {
+      max-width: 1200px;
+      margin: 40px auto 60px;
+      padding: 0 20px 40px;
+    }
+
+    /* --------------------------
+          헤더 영역
+      --------------------------- */
+    .page-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(45, 125, 252, 0.08);
+      color: #2563eb;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .page-desc {
+      margin: 0;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    /* --------------------------
+          상단 컨트롤 패널
+      --------------------------- */
+    .control-bar {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      font-size: 14px;
+      color: #4b5563;
+      font-weight: 500;
+    }
+
+    .nav-btn:hover {
+      color: var(--blue);
+    }
+
+    .project-label {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    #projectId {
+      width: 90px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      text-align: center;
+      background: white;
+      outline: none;
+    }
+
+    #projectId:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px rgba(45, 125, 252, 0.2);
+    }
+
+    .chip-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      cursor: pointer;
+      color: #4b5563;
+    }
+
+    .chip.active {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+
+    .round-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .round-btn:hover {
+      background: #f3f4f6;
+    }
+
+    #reloadBtn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #111827;
+      color: white;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    #reloadBtn:hover {
+      background: #020617;
+    }
+
+    /* --------------------------
+          상태 라인 / 메시지
+      --------------------------- */
+    .status-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    #statusLine {
+      font-weight: 500;
+      color: #111827;
+    }
+
+    #loadingState {
+      color: #2563eb;
+    }
+
+    #errorState {
+      color: #ef4444;
+    }
+
+    #emptyState {
+      color: #6b7280;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* --------------------------
+          갤러리 카드 그리드
+      --------------------------- */
+    .gallery-grid {
+      margin-top: 22px;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .card {
+      background: linear-gradient(145deg, #ffffff, #f3f4f6);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      transition: transform 160ms ease-out, box-shadow 160ms ease-out;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
+    }
+
+    .thumb-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: radial-gradient(circle at top, #e0edff, #c7d2fe);
+      overflow: hidden;
+    }
+
+    .thumb-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
+      transition: transform 200ms ease-out;
+    }
+
+    .card:hover .thumb-wrapper img {
+      transform: scale(1.06);
+    }
+
+    .thumb-badge {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.7);
+      color: #e5e7eb;
+      font-size: 12px;
+    }
+
+    .card-body {
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tag-pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.08);
+      color: #2563eb;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      font-size: 12px;
+      color: #4b5563;
+    }
+
+    .card-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-actions {
+      margin-top: 6px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-main {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 999px;
+      border: none;
+      background: var(--blue);
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-main:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-sub {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: white;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-sub:hover {
+      background: #f3f4f6;
+    }
+
+    /* --------------------------
+          로딩 인디케이터 / 무한 스크롤
+      --------------------------- */
+    .scroll-loader {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* --------------------------
+          모달
+      --------------------------- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-panel {
+      width: min(960px, 92vw);
+      max-height: 88vh;
+      background: #f9fafb;
+      border-radius: 24px;
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.4);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      .modal-panel {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .modal-image-wrap {
+      background: radial-gradient(circle at top, #e0edff, #c7d2fe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .modal-image-wrap img {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+    }
+
+    .modal-info {
+      padding: 16px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+
+    .modal-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e5e7eb;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      background: #d1d5db;
+    }
+
+    .modal-meta {
+      font-size: 13px;
+      color: #4b5563;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .modal-links {
+      margin-top: 8px;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .modal-links a {
+      color: #2563eb;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .modal-links a:hover {
+      text-decoration: underline;
+    }
+
+    .modal-footer-note {
+      margin-top: auto;
+      padding-top: 8px;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="gallery-main">
+    <header class="page-header">
+      <div class="page-title">
+        시공사례 이미지 갤러리
+        <span class="pill">R2 · PostgreSQL · Prisma</span>
+      </div>
+      <p class="page-desc">
+        프로젝트 ID 기준으로 R2에 저장된 이미지를 확인하고, 원본/썸네일 링크를
+        복사할 수 있습니다.
+      </p>
+
+      <div class="nav-links">
+        <a href="/admin/admin-projects.html" class="nav-btn">→ 프로젝트 관리 페이지로 이동</a>
+      </div>
+
+      <!-- 컨트롤 바 -->
+      <div class="control-bar">
+        <div class="control-group">
+          <span class="project-label">프로젝트 ID</span>
+          <input id="projectId" type="number" value="1" min="1" placeholder="예: 1" />
+          <button type="button" class="round-btn" data-role="project-prev" title="이전 프로젝트">
+            ‹
+          </button>
+          <button type="button" class="round-btn" data-role="project-next" title="다음 프로젝트">
+            ›
+          </button>
+
+          <div class="chip-buttons">
+            <button class="chip" data-project-shortcut="1">#1</button>
+            <button class="chip" data-project-shortcut="2">#2</button>
+            <button class="chip" data-project-shortcut="3">#3</button>
+          </div>
+        </div>
+
+        <button id="reloadBtn" type="button">
+          <span>새로고침</span>
+        </button>
+      </div>
+
+      <!-- 상태 / 메시지 -->
+      <div class="status-row">
+        <span id="statusLine" class="hidden"></span>
+        <span id="loadingState" class="hidden"></span>
+        <span id="errorState" class="hidden"></span>
+        <span id="emptyState" class="hidden"></span>
+      </div>
+    </header>
+
+    <!-- 갤러리 그리드 -->
+    <section class="gallery-grid" id="galleryGrid"></section>
+
+    <!-- 무한 스크롤 로딩 표시 -->
+    <div class="scroll-loader" id="scrollLoader" class="hidden"></div>
+  </main>
+
+  <!-- 모달 -->
+  <div class="modal-backdrop" id="imageModal">
+    <div class="modal-panel">
+      <div class="modal-image-wrap">
+        <img id="modalImage" src="" alt="" />
+      </div>
+      <div class="modal-info">
+        <div class="modal-header-row">
+          <div>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="project-label" id="modalSubTitle"></div>
+          </div>
+          <button class="modal-close" type="button" data-close-modal>
+            ✕
+          </button>
+        </div>
+        <div class="modal-meta" id="modalMeta"></div>
+        <div class="modal-links" id="modalLinks"></div>
+        <div class="modal-footer-note">
+          이 모달은 관리자 전용 미리보기 화면입니다. 실제 서비스 노출 전,
+          해상도/링크를 확인하세요.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공통 유틸리티 JS (API Fetch, 알림 등) -->
+  <script src="/common.js"></script>
+
+  <!-- 갤러리 JS -->
+  <script src="/admin/admin-gallery.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,322 @@
+/* about.css - Premium Ver. */
+
+/* 0. 리셋 및 변수 설정 */
+:root {
+  --primary-color: #1a1a1a; /* 딥 블랙 */
+  --accent-color: #c5a47e; /* 샴페인 골드 */
+  --text-gray: #555; /* 차분한 그레이 */
+  --line-color: #e5e5e5; /* 연한 라인 */
+  --bg-light: #f9f9f9;
+}
+
+* {
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 (정렬의 핵심) */
+}
+
+/* 1. 메인 레이아웃 (좌우 정렬의 기준) */
+.about-main {
+  max-width: 1200px; /* 폭을 넓혀 시원하게 */
+  margin: 120px auto 100px; /* 위아래 여백 넉넉히 */
+  padding: 0 40px; /* 좌우 내부 여백 */
+  width: 100%;
+}
+
+/* 2. 상단 타이틀 및 주소 영역 */
+.mapInformation {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.mapInformation h1 {
+  font-size: 2.8rem; /* 타이틀 키움 */
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+  letter-spacing: -1px; /* 자간을 좁혀 단단한 느낌 */
+}
+
+.map-desc {
+  color: var(--text-gray);
+  margin-bottom: 40px;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 주소 박스 (떠있는 듯한 카드 디자인) */
+.add-frame {
+  display: flex;
+  justify-content: center;
+}
+
+.map-address {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background-color: #fff; /* 흰색 배경으로 변경 */
+  padding: 20px 40px;
+  border-radius: 60px; /* 더 둥글게 */
+  border: 1px solid rgba(0, 0, 0, 0.05); /* 아주 연한 테두리 */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
+  transition: transform 0.3s ease;
+  margin-bottom: 50px;
+}
+
+.map-address:hover {
+  transform: translateY(-3px); /* 살짝 떠오르는 효과 */
+}
+
+.map-address .label {
+  background-color: var(--primary-color);
+  color: #c5a47e; /* 글씨를 골드로 */
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.map-address strong {
+  font-size: 1.2rem;
+  color: #333;
+  letter-spacing: -0.5px;
+}
+
+.copy-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.copy-btn:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+/* 3. 지도 프레임 */
+.map-frame {
+  width: 100%;
+  height: 400px;
+  border-radius: 2px; /* 라운드 거의 없애서 모던하게 */
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15); /* 깊은 그림자 */
+  margin-bottom: 80px;
+  /* border 제거: 지도는 깔끔하게 떨어지는 게 더 고급스러움 */
+}
+
+/* 4. 하단 정보 (교통편 + 연락처) - 그리드 정렬 */
+.contactDsc {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 1:1 비율로 정확히 나눔 */
+  gap: 60px; /* 사이 간격 넓힘 */
+  align-items: stretch; /* 높이 맞춤 */
+  border-top: 1px solid var(--primary-color); /* 상단 라인 추가로 구획 정리 */
+  padding-top: 60px;
+}
+
+/* 공통 타이틀 스타일 */
+.contactDsc h3 {
+  grid-column: 1 / -1;
+  display: none; /* 기존 h3 숨김 (디자인 변경 위해) */
+}
+
+/* 왼쪽: 교통편 리스트 */
+.visit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.visit-list li {
+  display: flex;
+  align-items: baseline;
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--line-color);
+}
+
+.visit-list li:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.visit-label {
+  display: inline-block;
+  width: 100px; /* 너비 고정 */
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.visit-detail {
+  color: var(--text-gray);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* 오른쪽: 연락처 박스 (프리미엄 카드 스타일) */
+.contact-box {
+  background-color: var(--primary-color);
+  background-image: linear-gradient(
+    135deg,
+    #1a1a1a 0%,
+    #2a2a2a 100%
+  ); /* 미세한 그라데이션 */
+  color: #fff;
+  padding: 60px 40px;
+  border-radius: 2px; /* 직각에 가까운 라운드 */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* 골드 라인 포인트 */
+.contact-box::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border: 1px solid rgba(197, 164, 126, 0.3); /* 연한 골드 테두리 */
+  pointer-events: none;
+}
+
+.contact-box .visit-label {
+  color: var(--accent-color); /* 골드 */
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  width: auto;
+}
+
+.contact-link {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  margin-bottom: 20px;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: -1px;
+  transition: color 0.3s;
+}
+
+.contact-link:hover {
+  color: var(--accent-color);
+}
+
+.visit-desc {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-weight: 300;
+}
+
+/* 5. 토스트 메시지 */
+#copyToast {
+  visibility: hidden;
+  min-width: 300px;
+  background-color: rgba(26, 26, 26, 0.95); /* 반투명 블랙 */
+  color: #fff;
+  text-align: center;
+  border-radius: 50px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1000;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  font-size: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#copyToast.show {
+  visibility: visible;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 40px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    bottom: 40px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+
+/* 6. 반응형 (모바일) */
+@media (max-width: 900px) {
+  .about-main {
+    padding: 0 20px;
+    margin-top: 100px;
+  }
+
+  .mapInformation h1 {
+    font-size: 2rem;
+  }
+
+  .map-address {
+    flex-direction: column;
+    padding: 25px;
+    border-radius: 20px;
+    width: 100%;
+  }
+
+  .contactDsc {
+    grid-template-columns: 1fr; /* 모바일에서 1줄로 */
+    gap: 40px;
+    padding-top: 40px;
+    border-top: none; /* 모바일에서 라인 제거 */
+  }
+
+  .visit-list {
+    order: 2; /* 연락처 박스를 위로 올리고 싶으면 order 조절 */
+  }
+
+  .contact-box {
+    padding: 40px 20px;
+    order: 1;
+  }
+
+  .map-frame {
+    height: 350px;
+  }
+
+  .contact-link {
+    font-size: 2rem;
+  }
+}

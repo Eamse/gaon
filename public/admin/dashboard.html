@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가온 인테리어 · 대시보드</title>
+    <link rel="stylesheet" href="/admin/admin-projects.css" />
+    <link rel="stylesheet" href="/admin/dashboard.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span style="color: #3b82f6">Gaon</span> Admin
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-category">관리 메뉴</div>
+
+                <a href="/admin/dashboard.html" class="menu-item active">
+                    <i class="fas fa-chart-pie"></i> 대시보드
+                </a>
+
+                <a href="/admin/admin-projects.html" class="menu-item">
+                    <i class="fas fa-hammer"></i> 현장/시공 관리
+                </a>
+
+                <a href="/admin/admin-gallery.html" class="menu-item">
+                    <i class="fas fa-images"></i> 갤러리 관리
+                </a>
+
+                <a href="/admin/admin-inquiries.html" class="menu-item">
+                    <i class="fas fa-envelope-open-text"></i> 고객 문의 관리
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button onclick="window.logout()" type="button" class="btn-logout-sidebar">
+                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content-wrapper">
+            <header class="header">
+                <div class="title">대시보드</div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">AD</div>
+                        <span>관리자님</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container dashboard-container">
+                <!-- 통계 카드 그리드 -->
+                <div class="stats-grid">
+                    <div class="stat-card stat-card-primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">오늘 방문자</div>
+                            <div class="stat-value" id="visitorsToday">-</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 12% 증가
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-card-success">
+                        <div class="stat-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">이번 달 문의</div>
+                            <div class="stat-value" id="inquiriesMonth">-</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 8% 증가
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-card-warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-hammer"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">총 프로젝트</div>
+                            <div class="stat-value" id="totalProjects">-</div>
+                            <div class="stat-change neutral">
+                                <i class="fas fa-minus"></i> 변동 없음
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card stat-card-info">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-label">대기 중 문의</div>
+                            <div class="stat-value" id="pendingInquiries">-</div>
+                            <div class="stat-change">
+                                <i class="fas fa-exclamation-circle"></i> 확인 필요
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 차트 및 활동 섹션 -->
+                <div class="dashboard-grid">
+                    <!-- 방문자 추이 차트 -->
+                    <div class="dashboard-card chart-card">
+                        <div class="card-header">
+                            <h3>방문자 추이</h3>
+                            <div class="card-actions">
+                                <button class="btn-filter active" data-period="7">7일</button>
+                                <button class="btn-filter" data-period="30">30일</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="visitorsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 최근 활동 -->
+                    <div class="dashboard-card activity-card">
+                        <div class="card-header">
+                            <h3>최근 활동</h3>
+                            <a href="/admin/admin-inquiries.html" class="btn-link">전체보기</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list" id="recentActivities">
+                                <div class="activity-item">
+                                    <div class="activity-icon activity-icon-new">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">새로운 견적 문의</div>
+                                        <div class="activity-meta">홍길동 · 아파트 32평 · 5분 전</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item">
+                                    <div class="activity-icon activity-icon-project">
+                                        <i class="fas fa-hammer"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">프로젝트 등록</div>
+                                        <div class="activity-meta">강남 오피스텔 리모델링 · 1시간 전</div>
+                                    </div>
+                                </div>
+
+                                <div class="activity-item">
+                                    <div class="activity-icon activity-icon-image">
+                                        <i class="fas fa-images"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">갤러리 업로드</div>
+                                        <div class="activity-meta">시공사례 8장 추가 · 2시간 전</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 빠른 액션 -->
+                    <div class="dashboard-card quick-actions-card">
+                        <div class="card-header">
+                            <h3>빠른 작업</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-actions">
+                                <a href="/admin/admin-projects.html" class="quick-action-btn">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <span>프로젝트 등록</span>
+                                </a>
+                                <a href="/admin/admin-gallery.html" class="quick-action-btn">
+                                    <i class="fas fa-upload"></i>
+                                    <span>이미지 업로드</span>
+                                </a>
+                                <a href="/admin/admin-inquiries.html" class="quick-action-btn">
+                                    <i class="fas fa-envelope-open"></i>
+                                    <span>문의 관리</span>
+                                </a>
+                                <a href="/project/project.html" target="_blank" class="quick-action-btn">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>사이트 미리보기</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 인기 페이지 -->
+                    <div class="dashboard-card popular-pages-card">
+                        <div class="card-header">
+                            <h3>인기 페이지</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="page-list" id="popularPages">
+                                <div class="page-item">
+                                    <div class="page-rank">1</div>
+                                    <div class="page-info">
+                                        <div class="page-title">시공사례</div>
+                                        <div class="page-visits">1,234 방문</div>
+                                    </div>
+                                    <div class="page-bar">
+                                        <div class="page-bar-fill" style="width: 100%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="page-item">
+                                    <div class="page-rank">2</div>
+                                    <div class="page-info">
+                                        <div class="page-title">메인 페이지</div>
+                                        <div class="page-visits">987 방문</div>
+                                    </div>
+                                    <div class="page-bar">
+                                        <div class="page-bar-fill" style="width: 80%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="page-item">
+                                    <div class="page-rank">3</div>
+                                    <div class="page-info">
+                                        <div class="page-title">견적 상담</div>
+                                        <div class="page-visits">654 방문</div>
+                                    </div>
+                                    <div class="page-bar">
+                                        <div class="page-bar-fill" style="width: 53%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="page-item">
+                                    <div class="page-rank">4</div>
+                                    <div class="page-info">
+                                        <div class="page-title">찾아오시는 길</div>
+                                        <div class="page-visits">432 방문</div>
+                                    </div>
+                                    <div class="page-bar">
+                                        <div class="page-bar-fill" style="width: 35%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/common.js"></script>
+    <script src="/admin/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "./",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src",
+    "prisma/**/*.ts",
+    "pulbic/common.js",
+    "pulbic/consulting/consulting.js"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

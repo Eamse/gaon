@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>가온 인테리어</title>
+  <meta name="woojin-api-base" content="https://gaoninterior.kr/api" />
+
+  <link rel="stylesheet" href="/index.css" />
+  <link rel="stylesheet" href="/layout/layout.css" />
+  <link rel="stylesheet" href="/project/project.css" />
+
+  <script src="https://kit.fontawesome.com/0018d0d2c3.js" crossorigin="anonymous" defer></script>
+</head>
+
+<body>
+  <div id="layout-header"></div>
+
+  <!-- 프로젝트 메인 -->
+  <main class="project-main">
+    <div class="aside-form">
+      <!-- 사이드바 -->
+      <div class="project-filter">
+        <aside class="aside-content">
+          <h2>시공타입</h2>
+          <ul class="filter-list" data-filter-list>
+            <li class="filter-item active" data-category="">전체보기</li>
+            <li class="filter-item" data-category="주거공간">주거공간</li>
+            <li class="filter-item" data-category="상업공간">상업공간</li>
+            <li class="filter-item" data-category="오피스공간">오피스공간</li>
+            <li class="filter-item" data-category="리모델링">리모델링</li>
+          </ul>
+        </aside>
+      </div>
+
+      <!-- 프로젝트 그리드 -->
+      <div class="project-trigger">
+        <div class="sub-content">
+          <div class="sec sec1">
+            <!-- 상단 필터/정렬/검색 영역 -->
+            <div class="content-filter">
+              <div class="total">
+                총 <strong data-total-count>0</strong>건의 시공사례
+              </div>
+
+              <div class="content-filter-right">
+                <!-- 검색 -->
+                <div class="search-box">
+                  <input type="search" placeholder="프로젝트명, 파일명 검색" data-search-input />
+                  <button type="button" data-search-button>검색</button>
+                </div>
+                <div data-project-empty hidden style="text-align: center; padding: 50px 0">
+                  <p style="font-size: 1.2rem; color: #999">
+                    검색 결과가 없습니다.
+                  </p>
+                </div>
+                <!-- 정렬 드롭다운 -->
+                <div class="sorting" data-sort>
+                  <button class="sort-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span data-sort-label>최신순</span>
+                  </button>
+                  <ul class="sort-list" data-sort-list>
+                    <li>
+                      <button type="button" data-sort-value="recent">
+                        최신순
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" data-sort-value="oldest">
+                        오래된 순
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- 그리드 이미지 -->
+            <ul class="grid-wrap" data-project-grid></ul>
+            <p class="project-empty" data-project-empty hidden>
+              표시할 시공사례가 없습니다.
+            </p>
+
+            <!-- 무한 스크롤 센티널 -->
+            <div class="project-scroll-sentinel" data-project-sentinel aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="layout-footer"></div>
+
+  <!-- 이미지 모달 -->
+  <div class="project-modal" data-project-modal hidden>
+    <div class="project-modal-backdrop" data-project-modal-close></div>
+    <div class="project-modal-dialog" role="dialog" aria-modal="true">
+      <button class="project-modal-close" type="button" aria-label="닫기" data-project-modal-close>
+        &times;
+      </button>
+      <div class="project-modal-image-wrap">
+        <img class="project-modal-image" data-project-modal-image alt="시공사례 이미지" />
+      </div>
+      <div class="project-modal-body">
+        <h2 class="project-modal-title" data-project-modal-title></h2>
+        <p class="project-modal-meta" data-project-modal-meta></p>
+        <a href="#" target="_blank" rel="noopener" class="project-modal-link" data-project-modal-link>
+          원본 이미지 열기
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- API BASE 설정 -->
+  <script>
+    (function () {
+      if (window.WOOJIN_API_BASE) return;
+      const meta = document.querySelector('meta[name="woojin-api-base"]');
+      let base = meta?.content || 'https://gaoninterior.kr/api';
+      if (window.location.protocol === 'file:' && !/^https?:/i.test(base)) {
+        base = 'https://gaoninterior.kr/api';
+      }
+      window.WOOJIN_API_BASE = base.replace(/\/$/, '') || base;
+    })();
+  </script>
+
+  <script src="/layout/layout.js" defer></script>
+  <script src="/index.js" defer></script>
+  <script src="/project/project.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Project {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String?
+  location    String?
+  category    String?
+  mainImage   String?
+  year        Int?
+  period      String?
+  area        Float?
+  price       Int?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  images      ProjectImage[]
+  costs       ProjectCost[]
+}
+
+model ProjectImage {
+  id          Int      @id @default(autoincrement())
+  projectId   Int
+  filename    String
+  originalUrl String
+  largeUrl    String
+  mediumUrl   String
+  thumbUrl    String?
+  width       Int?
+  height      Int?
+  sizeBytes   Int?
+  createdAt   DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id])
+}
+
+model ProjectCost {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  label     String  // 시공 타입 (예: 철거 공사, 목공)
+  amount    Int     // 금액
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model AdminImage {
+  id          Int      @id @default(autoincrement())
+  filename    String   @unique // 파일 이름 (예: 1764148578520-0m1vtk-img_1153.png)
+  title       String   @default("")
+  category    String   @default("")
+  sizeBytes   Int?
+  width       Int?
+  height      Int?
+  originalUrl String
+  largeUrl    String
+  mediumUrl   String
+  thumbUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 상세 갤러리 이미지를 위한 관계 (나중에 추가할 기능)
+  galleryImages AdminGalleryImage[]
+}
+
+// 어드민 이미지에 속한 상세 갤러리 이미지
+model AdminGalleryImage {
+  id          Int      @id @default(autoincrement())
+  alt         String   @default("")
+  order       Int      @default(0)
+  originalUrl String
+  largeUrl    String
+  mediumUrl   String
+  thumbUrl    String
+  sizeBytes   Int?
+  width       Int?
+  height      Int?
+  createdAt   DateTime @default(now())
+
+  
+
+  // AdminImage와의 관계 설정
+
+    adminImageId Int
+
+    adminImage   AdminImage @relation(fields: [adminImageId], references: [id], onDelete: Cascade)
+
+  }
+
+//관리자 계정 생성
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//consultingInquery
+model Inquiry {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  userName  String
+  userPhone String
+  spaceType String?
+  areaSize  Int?
+  location  String?
+  scope     String?
+  budget    Int?
+  schedule  String?
+  requests  String?  @db.Text
+  status    String   @default("new")
+  adminMemo String?  @db.Text
+}
+
+// 방문자 통계
+model VisitLog {
+  id        Int      @id @default(autoincrement())
+  ipHash    String   // IP + salt 해시
+  userAgent String?
+  path      String
+  referrer  String?
+  createdAt DateTime @default(now())
+}
+
+model VisitStat {
+  id    Int      @id @default(autoincrement())
+  date  DateTime // yyyy-MM-dd 00:00:00 형태
+  path  String
+  pv    Int
+  uv    Int
+  @@unique([date, path])
+}
+
+
+  
