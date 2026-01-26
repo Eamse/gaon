@@ -3,7 +3,7 @@
 // [추가] 토큰이 없으면 로그인 페이지로 강제 이동
 if (!localStorage.getItem('token')) {
   alert('로그인이 만료되었거나 필요합니다.\n로그인 페이지로 이동합니다.');
-  window.location.replace('/src/admin-login.html');
+  window.location.replace('/admin/admin-login');
 }
 
 // 전역 변수로 프로젝트 데이터 저장
@@ -116,12 +116,10 @@ function renderProjects(projects) {
           </div>
           <div class="p-desc">${p.description || '설명 없음'}</div>
           <div class="p-actions">
-            <a href="/src/admin-gallery.html?projectId=${
-              p.id
-            }" class="btn-action btn-view">이미지 관리</a>
-            <button class="btn-action btn-view" style="background:#f3f4f6; color:#4b5563;" data-action="edit" data-id="${
-              p.id
-            }">수정</button>
+            <a href="/admin/admin-gallery?projectId=${p.id
+      }" class="btn-action btn-view">이미지 관리</a>
+            <button class="btn-action btn-view" style="background:#f3f4f6; color:#4b5563;" data-action="edit" data-id="${p.id
+      }">수정</button>
             <button class="btn-action btn-del" data-id="${p.id}">삭제</button>
           </div>
         </div>
@@ -198,7 +196,7 @@ async function handleFormSubmit(e) {
       window.logout();
     } else {
       localStorage.removeItem('token');
-      window.location.href = '/src/admin-login.html';
+      window.location.href = '/admin/admin-login';
     }
   };
 

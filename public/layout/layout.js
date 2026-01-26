@@ -54,11 +54,11 @@ function resolveHeaderLinks(container) {
   if (!container) return;
 
   const linkMap = {
-    home: '../index.html',
-    project: 'project/project.html',
-    progress: 'progress/progress.html',
-    consulting: 'consulting/consulting.html',
-    about: 'about/about.html',
+    home: '../',
+    project: 'project/',
+    progress: 'progress/',
+    consulting: 'consulting/',
+    about: 'about/',
   };
 
   container.querySelectorAll('[data-layout-link]').forEach((anchor) => {

@@ -347,7 +347,7 @@
       dom.consultButton.addEventListener('click', () => {
         // 상담 페이지로 이동 (프로젝트 제목을 쿼리 파라미터로 전달하면 더 좋습니다)
         // layout.js 구조상 consulting 폴더가 별도로 있으므로 상위 경로로 이동
-        const consultUrl = `../consulting/consulting.html?ref_project=${encodeURIComponent(
+        const consultUrl = `../consulting?ref_project=${encodeURIComponent(
           project.title
         )}`;
         window.location.href = consultUrl;

@@ -94,7 +94,7 @@ async function initProjectSwiper() {
 
         return `
     <li class="img-card">
-       <a href="/project/project-detail.html?id=${p.id}">
+       <a href="/project/project-detail?id=${p.id}">
         <img 
           src="${thumbSrc}" 
           alt="${p.title}" 

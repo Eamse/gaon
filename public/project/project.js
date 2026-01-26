@@ -105,7 +105,7 @@ const API_BASE = resolveApiBase();
     const link = document.createElement('a');
 
     // ✅ 이제 name이 아니라 id로 라우팅
-    link.href = `./project-detail.html?id=${project.id}`;
+    link.href = `./project-detail?id=${project.id}`;
 
     const imgWrap = document.createElement('div');
     imgWrap.className = 'img';
