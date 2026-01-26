@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.join(__dirname, '..');
 const UPLOAD_DIR = path.join(ROOT_DIR, 'uploads');
 const SRC_DIR = path.join(ROOT_DIR, 'src');
-const PUBLIC_DIR = ROOT_DIR;
+const PUBLIC_DIR = path.join(ROOT_DIR, 'public');
 
 // 업로드 관련 폴더가 없으면 자동 생성 (동기 처리)
 const DIR_ORIGINAL = path.join(UPLOAD_DIR, 'original');
@@ -174,9 +174,10 @@ app.use(express.static(PUBLIC_DIR));
 // ---------------------------
 // 헬스 체크 라우트
 // ---------------------------
-app.get('/', (req, res) => {
-  res.json({ ok: true, message: 'Gaon backend is running' });
-});
+// app.get('/', (req, res) => {
+//   res.json({ ok: true, message: 'Gaon backend is running' });
+// });
+
 
 // ---------------------------
 // 실제 API 라우트
