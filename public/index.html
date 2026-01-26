@@ -123,7 +123,7 @@
           </div>
         </div>
 
-        <a href="/about.html" class="mission-link reveal delay-300">
+        <a href="/about" class="mission-link reveal delay-300">
           VIEW OUR PROJECTS
           <i class="fa-solid fa-arrow-right"></i>
         </a>
@@ -165,8 +165,8 @@
         가온 인테리어와 함께 시작해보세요.
       </p>
       <div class="cta-btn-group">
-        <a href="/consulting/consulting.html" class="btn-gold">견적 상담하기</a>
-        <a href="/project/project.html" class="btn-line">시공사례 더보기</a>
+        <a href="/consulting" class="btn-gold">견적 상담하기</a>
+        <a href="/project" class="btn-line">시공사례 더보기</a>
       </div>
     </div>
   </section>
@@ -183,8 +183,8 @@
       setTimeout(() => {
         const navLinks = document.querySelectorAll('.site-nav a');
         navLinks.forEach((link) => {
-          if (link.getAttribute('href') === '/construction.html') {
-            link.setAttribute('href', '/project/project.html');
+          if (link.getAttribute('href') === '/construction') {
+            link.setAttribute('href', '/project');
           }
         });
       }, 500);
