@@ -172,6 +172,17 @@ app.use(
 app.use(express.static(PUBLIC_DIR));
 
 // ---------------------------
+// 관리자 루트 경로 리다이렉트
+// ---------------------------
+app.get('/admin', (req, res) => {
+  res.redirect('/admin/admin-login');
+});
+
+app.get('/admin/', (req, res) => {
+  res.redirect('/admin/admin-login');
+});
+
+// ---------------------------
 // Clean URL 처리 (확장자 없이 HTML 파일 서빙)
 // ---------------------------
 app.use((req, res, next) => {
