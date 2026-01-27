@@ -134,6 +134,8 @@ app.use('/src', (req, res, next) => {
 const ALLOWED_ORIGINS = new Set([
   'http://localhost:4000',
   'http://127.0.0.1:4000',
+  'http://localhost:4001',
+  'http://127.0.0.1:4001',
   'http://localhost:5500',
   'http://127.0.0.1:5500',
   'http://localhost:5502',
@@ -142,6 +144,8 @@ const ALLOWED_ORIGINS = new Set([
   'http://gaoninterior.kr',
   'https://www.gaoninterior.kr',
   'http://www.gaoninterior.kr',
+  'https://admin.gaoninterior.kr',
+  'http://admin.gaoninterior.kr',
 ]);
 
 const corsOptions = {
