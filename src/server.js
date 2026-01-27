@@ -180,7 +180,22 @@ app.use((req, res, next) => {
     return next();
   }
 
-  // HTML 파일 경로 후보들
+  // /admin/ 경로 처리
+  if (req.path.startsWith('/admin/')) {
+    const adminPath = req.path.replace('/admin/', '');
+    const candidates = [
+      path.join(PUBLIC_DIR, 'admin', `${adminPath}.html`),
+      path.join(PUBLIC_DIR, 'admin', adminPath, `${path.basename(adminPath)}.html`),
+    ];
+
+    for (const candidate of candidates) {
+      if (fs.existsSync(candidate)) {
+        return res.sendFile(candidate);
+      }
+    }
+  }
+
+  // 일반 경로 처리
   const candidates = [
     path.join(PUBLIC_DIR, `${req.path}.html`),
     path.join(PUBLIC_DIR, req.path, `${path.basename(req.path)}.html`),
