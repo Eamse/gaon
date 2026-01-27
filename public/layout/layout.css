@@ -178,7 +178,7 @@ a {
 /* 푸터 영역 시작 (수정됨) */
 /* ---------------------- */
 
-.woojin-info {
+.gaon-info {
   background-color: #f8f9fa;
   border-top: 1px solid #e9ecef;
   padding: 60px 80px 65px;
@@ -416,7 +416,7 @@ a {
   }
 
   /* 푸터 모바일 정렬 */
-  .woojin-info {
+  .gaon-info {
     padding: 40px 20px 85px; /* 하단바 두께 고려 여백 */
   }
 
@@ -441,7 +441,7 @@ a {
 }
 
 @media screen and (max-width: 400px) {
-  .woojin-info {
+  .gaon-info {
     padding: 40px 10px 85px;
   }
 }

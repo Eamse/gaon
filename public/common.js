@@ -2,7 +2,7 @@
 
 // 1. API Base URL 설정
 const resolveApiBase = () => {
-  const meta = document.querySelector('meta[name="woojin-api-base"]');
+  const meta = document.querySelector('meta[name="gaon-api-base"]');
   const { hostname, port, protocol, origin } = window.location;
 
   // 로컬/개발 환경
@@ -26,7 +26,7 @@ const resolveApiBase = () => {
   return `${origin}/api`.replace(/\/$/, '');
 };
 
-window.WOOJIN_API_BASE = resolveApiBase();
+window.GAON_API_BASE = resolveApiBase();
 
 // 2. 공통 API 호출 함수 (window.apiFetch)
 window.apiFetch = async (url, options = {}) => {
@@ -62,8 +62,8 @@ window.apiFetch = async (url, options = {}) => {
 
   // URL이 '/'로 시작하면 API Base URL을 앞에 붙여줌
   let requestUrl = url;
-  if (url.startsWith('/') && window.WOOJIN_API_BASE) {
-    requestUrl = `${window.WOOJIN_API_BASE}${url}`;
+  if (url.startsWith('/') && window.GAON_API_BASE) {
+    requestUrl = `${window.GAON_API_BASE}${url}`;
   }
 
   try {

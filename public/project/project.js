@@ -1,6 +1,6 @@
 // project.js
 const resolveApiBase = () => {
-  const meta = document.querySelector('meta[name="woojin-api-base"]');
+  const meta = document.querySelector('meta[name="gaon-api-base"]');
   if (meta?.content) {
     return meta.content.replace(/\/$/, '');
   }

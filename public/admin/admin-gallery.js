@@ -1,5 +1,5 @@
 const API_BASE =
-  (window.WOOJIN_API_BASE && window.WOOJIN_API_BASE.replace(/\/$/, '')) ||
+  (window.GAON_API_BASE && window.GAON_API_BASE.replace(/\/$/, '')) ||
   'https://gaoninterior.kr/api';
 
 // 상태 관리

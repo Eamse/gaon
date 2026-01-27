@@ -16,8 +16,8 @@
    * @returns {string} API base URL
   */
   const resolveApiBase = () => {
-    if (window.WOOJIN_API_BASE) {
-      return window.WOOJIN_API_BASE.replace(/\/$/, '');
+    if (window.GAON_API_BASE) {
+      return window.GAON_API_BASE.replace(/\/$/, '');
     }
     if (window.location.origin && window.location.origin !== 'null') {
       return `${window.location.origin.replace(/\/$/, '')}/api`;

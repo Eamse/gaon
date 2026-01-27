@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>가온 인테리어</title>
-  <meta name="woojin-api-base" content="https://gaoninterior.kr/api" />
+  <meta name="gaon-api-base" content="https://gaoninterior.kr/api" />
 
   <link rel="stylesheet" href="/index.css" />
   <link rel="stylesheet" href="/layout/layout.css" />
@@ -115,13 +115,13 @@
   <!-- API BASE 설정 -->
   <script>
     (function () {
-      if (window.WOOJIN_API_BASE) return;
-      const meta = document.querySelector('meta[name="woojin-api-base"]');
+      if (window.GAON_API_BASE) return;
+      const meta = document.querySelector('meta[name="gaon-api-base"]');
       let base = meta?.content || 'https://gaoninterior.kr/api';
       if (window.location.protocol === 'file:' && !/^https?:/i.test(base)) {
         base = 'https://gaoninterior.kr/api';
       }
-      window.WOOJIN_API_BASE = base.replace(/\/$/, '') || base;
+      window.GAON_API_BASE = base.replace(/\/$/, '') || base;
     })();
   </script>
 
