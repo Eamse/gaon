@@ -172,6 +172,32 @@ app.use(
 app.use(express.static(PUBLIC_DIR));
 
 // ---------------------------
+// Clean URL 처리 (확장자 없이 HTML 파일 서빙)
+// ---------------------------
+app.use((req, res, next) => {
+  // API 요청이나 파일 확장자가 있는 요청은 건너뜀
+  if (req.path.startsWith('/api') || req.path.includes('.')) {
+    return next();
+  }
+
+  // HTML 파일 경로 후보들
+  const candidates = [
+    path.join(PUBLIC_DIR, `${req.path}.html`),
+    path.join(PUBLIC_DIR, req.path, `${path.basename(req.path)}.html`),
+  ];
+
+  // 파일이 존재하는지 확인하고 서빙
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return res.sendFile(candidate);
+    }
+  }
+
+  // HTML 파일이 없으면 다음 미들웨어로
+  next();
+});
+
+// ---------------------------
 // 헬스 체크 라우트
 // ---------------------------
 // app.get('/', (req, res) => {
