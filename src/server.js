@@ -172,14 +172,14 @@ app.use(
 app.use(express.static(PUBLIC_DIR));
 
 // ---------------------------
-// 관리자 루트 경로 리다이렉트
+// 관리자 루트 경로 처리
 // ---------------------------
 app.get('/admin', (req, res) => {
-  res.redirect('/admin/admin-login');
+  res.sendFile(path.join(PUBLIC_DIR, 'admin/admin-login.html'));
 });
 
 app.get('/admin/', (req, res) => {
-  res.redirect('/admin/admin-login');
+  res.sendFile(path.join(PUBLIC_DIR, 'admin/admin-login.html'));
 });
 
 // ---------------------------
