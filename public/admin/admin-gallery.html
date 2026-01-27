@@ -4,569 +4,378 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>가온 인테리어 · 시공사례 갤러리</title>
-
-  <!-- API BASE -->
-  <meta name="gaon-api-base" content="https://gaoninterior.kr/api" />
-
+  <title>가온 인테리어 · 프로젝트 관리</title>
+  <link rel="stylesheet" href="/admin/admin-projects.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
   <style>
-    /* --------------------------
-          기본 레이아웃 / 배경
-      --------------------------- */
-    :root {
-      --blue: #2d7dfc;
-      --blue-soft: #e3efff;
-      --bg: #f5f6f8;
-      --radius-card: 18px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top left,
-          rgba(90, 164, 255, 0.18),
-          transparent 55%),
-        #f5f6f8;
-      font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', system-ui,
-        sans-serif;
-      color: #111827;
-    }
-
-    .gallery-main {
-      max-width: 1200px;
-      margin: 40px auto 60px;
-      padding: 0 20px 40px;
-    }
-
-    /* --------------------------
-          헤더 영역
-      --------------------------- */
-    .page-header {
+    /* Gallery specific styles */
+    .filter-bar {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .page-title {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pill {
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(45, 125, 252, 0.08);
-      color: #2563eb;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .page-desc {
-      margin: 0;
-      color: #4b5563;
-      font-size: 14px;
-    }
-
-    /* --------------------------
-          상단 컨트롤 패널
-      --------------------------- */
-    .control-bar {
-      margin-top: 14px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .control-group {
-      display: flex;
-      align-items: center;
       gap: 8px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
     }
 
-    .nav-links {
-      display: flex;
-      gap: 10px;
-    }
-
-    .nav-btn {
-      text-decoration: none;
-      font-size: 14px;
-      color: #4b5563;
-      font-weight: 500;
-    }
-
-    .nav-btn:hover {
-      color: var(--blue);
-    }
-
-    .project-label {
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    #projectId {
-      width: 90px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      font-size: 14px;
-      text-align: center;
-      background: white;
-      outline: none;
-    }
-
-    #projectId:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 1px rgba(45, 125, 252, 0.2);
-    }
-
-    .chip-buttons {
-      display: flex;
-      gap: 6px;
-    }
-
-    .chip {
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      border: 1px solid #e5e7eb;
-      background: #ffffff;
-      cursor: pointer;
-      color: #4b5563;
-    }
-
-    .chip.active {
-      background: var(--blue);
-      color: white;
-      border-color: var(--blue);
-    }
-
-    .round-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
+    .filter-btn {
+      padding: 8px 16px;
       border: 1px solid #d1d5db;
       background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
+      transition: all 0.2s;
     }
 
-    .round-btn:hover {
+    .filter-btn:hover {
       background: #f3f4f6;
     }
 
-    #reloadBtn {
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: none;
-      background: #111827;
+    .filter-btn.active {
+      background: #3b82f6;
       color: white;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
+      border-color: #3b82f6;
     }
 
-    #reloadBtn:hover {
-      background: #020617;
-    }
-
-    /* --------------------------
-          상태 라인 / 메시지
-      --------------------------- */
-    .status-row {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      font-size: 13px;
-    }
-
-    #statusLine {
-      font-weight: 500;
-      color: #111827;
-    }
-
-    #loadingState {
-      color: #2563eb;
-    }
-
-    #errorState {
-      color: #ef4444;
-    }
-
-    #emptyState {
-      color: #6b7280;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* --------------------------
-          갤러리 카드 그리드
-      --------------------------- */
-    .gallery-grid {
-      margin-top: 22px;
+    .projects-grid {
       display: grid;
-      gap: 18px;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
     }
 
-    .card {
-      background: linear-gradient(145deg, #ffffff, #f3f4f6);
-      border-radius: var(--radius-card);
+    .project-card {
+      background: white;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-      display: flex;
-      flex-direction: column;
-      transition: transform 160ms ease-out, box-shadow 160ms ease-out;
-      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .card:hover {
+    .project-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     }
 
-    .thumb-wrapper {
-      position: relative;
+    .card-image {
       width: 100%;
-      aspect-ratio: 4/3;
-      background: radial-gradient(circle at top, #e0edff, #c7d2fe);
-      overflow: hidden;
-    }
-
-    .thumb-wrapper img {
-      width: 100%;
-      height: 100%;
+      height: 200px;
       object-fit: cover;
-      transform: scale(1.02);
-      transition: transform 200ms ease-out;
+      background: #f3f4f6;
     }
 
-    .card:hover .thumb-wrapper img {
-      transform: scale(1.06);
-    }
-
-    .thumb-badge {
-      position: absolute;
-      left: 12px;
-      bottom: 12px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.7);
-      color: #e5e7eb;
-      font-size: 12px;
-    }
-
-    .card-body {
-      padding: 14px 14px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    .card-content {
+      padding: 16px;
     }
 
     .card-title {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
+      margin: 0 0 8px 0;
       color: #111827;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .tag-pill {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(37, 99, 235, 0.08);
-      color: #2563eb;
     }
 
     .card-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 12px;
-      font-size: 12px;
-      color: #4b5563;
-    }
-
-    .card-meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 12px;
     }
 
     .card-actions {
-      margin-top: 6px;
       display: flex;
       gap: 8px;
     }
 
-    .btn-main {
+    .card-btn {
       flex: 1;
-      padding: 6px 0;
-      border-radius: 999px;
-      border: none;
-      background: var(--blue);
-      color: white;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .btn-main:hover {
-      background: #1d4ed8;
-    }
-
-    .btn-sub {
-      flex: 1;
-      padding: 6px 0;
-      border-radius: 999px;
+      padding: 8px;
       border: 1px solid #d1d5db;
       background: white;
-      font-size: 12px;
+      border-radius: 6px;
       cursor: pointer;
-    }
-
-    .btn-sub:hover {
-      background: #f3f4f6;
-    }
-
-    /* --------------------------
-          로딩 인디케이터 / 무한 스크롤
-      --------------------------- */
-    .scroll-loader {
-      margin-top: 18px;
-      text-align: center;
       font-size: 13px;
-      color: #6b7280;
+      transition: all 0.2s;
     }
 
-    /* --------------------------
-          모달
-      --------------------------- */
-    .modal-backdrop {
+    .card-btn.preview {
+      background: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+
+    .card-btn.edit {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .card-btn.delete {
+      background: #ef4444;
+      color: white;
+      border-color: #ef4444;
+    }
+
+    .card-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* Edit Modal */
+    .modal-overlay {
+      display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.45);
-      display: none;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
       align-items: center;
       justify-content: center;
-      z-index: 40;
     }
 
-    .modal-backdrop.show {
+    .modal-overlay.show {
       display: flex;
     }
 
-    .modal-panel {
-      width: min(960px, 92vw);
-      max-height: 88vh;
-      background: #f9fafb;
-      border-radius: 24px;
-      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.4);
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    }
-
-    @media (max-width: 768px) {
-      .modal-panel {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .modal-image-wrap {
-      background: radial-gradient(circle at top, #e0edff, #c7d2fe);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-    }
-
-    .modal-image-wrap img {
-      width: 100%;
-      height: auto;
+    .modal-container {
+      background: white;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
     }
 
-    .modal-info {
-      padding: 16px 18px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      position: relative;
-    }
-
-    .modal-header-row {
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
-    }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #e5e7eb;
     }
 
     .modal-close {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
+      background: none;
       border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #e5e7eb;
+      font-size: 24px;
       cursor: pointer;
+      color: #6b7280;
     }
 
     .modal-close:hover {
-      background: #d1d5db;
+      color: #111827;
     }
 
-    .modal-meta {
-      font-size: 13px;
-      color: #4b5563;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    .loading-state {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
     }
 
-    .modal-links {
-      margin-top: 8px;
-      font-size: 13px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
     }
 
-    .modal-links a {
-      color: #2563eb;
-      text-decoration: none;
-      word-break: break-all;
-    }
-
-    .modal-links a:hover {
-      text-decoration: underline;
-    }
-
-    .modal-footer-note {
-      margin-top: auto;
-      padding-top: 8px;
-      font-size: 11px;
-      color: #9ca3af;
+    .category-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
     }
   </style>
 </head>
 
 <body>
-  <main class="gallery-main">
-    <header class="page-header">
-      <div class="page-title">
-        시공사례 이미지 갤러리
-        <span class="pill">R2 · PostgreSQL · Prisma</span>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span style="color: #3b82f6">Gaon</span> Admin
       </div>
-      <p class="page-desc">
-        프로젝트 ID 기준으로 R2에 저장된 이미지를 확인하고, 원본/썸네일 링크를
-        복사할 수 있습니다.
-      </p>
+      <nav class="sidebar-menu">
+        <div class="menu-category">관리 메뉴</div>
 
-      <div class="nav-links">
-        <a href="/admin/admin-projects" class="nav-btn">→ 프로젝트 관리 페이지로 이동</a>
+        <a href="/admin/dashboard" class="menu-item">
+          <i class="fas fa-chart-pie"></i> 대시보드
+        </a>
+
+        <a href="/admin/admin-projects" class="menu-item">
+          <i class="fas fa-hammer"></i> 프로젝트 등록
+        </a>
+
+        <a href="/admin/admin-gallery" class="menu-item active">
+          <i class="fas fa-images"></i> 프로젝트 관리
+        </a>
+
+        <a href="/admin/admin-inquiries" class="menu-item">
+          <i class="fas fa-envelope-open-text"></i> 고객 문의 관리
+        </a>
+
+        <div class="menu-category" style="margin-top: 20px">분석</div>
+        <a href="/admin/admin-analytics" class="menu-item">
+          <i class="fas fa-chart-line"></i> 방문자 통계
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="window.logout()" type="button" class="btn-logout-sidebar">
+          <i class="fas fa-sign-out-alt"></i> 로그아웃
+        </button>
       </div>
+    </aside>
 
-      <!-- 컨트롤 바 -->
-      <div class="control-bar">
-        <div class="control-group">
-          <span class="project-label">프로젝트 ID</span>
-          <input id="projectId" type="number" value="1" min="1" placeholder="예: 1" />
-          <button type="button" class="round-btn" data-role="project-prev" title="이전 프로젝트">
-            ‹
-          </button>
-          <button type="button" class="round-btn" data-role="project-next" title="다음 프로젝트">
-            ›
-          </button>
-
-          <div class="chip-buttons">
-            <button class="chip" data-project-shortcut="1">#1</button>
-            <button class="chip" data-project-shortcut="2">#2</button>
-            <button class="chip" data-project-shortcut="3">#3</button>
+    <!-- Main Content -->
+    <main class="main-content-wrapper">
+      <header class="header">
+        <div class="title">프로젝트 관리</div>
+        <div class="header-right">
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <span>관리자님</span>
           </div>
         </div>
+      </header>
 
-        <button id="reloadBtn" type="button">
-          <span>새로고침</span>
+      <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+          <h2>등록된 프로젝트 관리</h2>
+          <p>등록된 시공사례를 조회, 수정, 삭제할 수 있습니다.</p>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-bar">
+          <button class="filter-btn active" data-category="all">
+            <i class="fas fa-list"></i> 전체
+          </button>
+          <button class="filter-btn" data-category="단창">
+            단창
+          </button>
+          <button class="filter-btn" data-category="이중창 (외창 + 내창)">
+            이중창
+          </button>
+          <button class="filter-btn" data-category="시스템 단창">
+            시스템 단창
+          </button>
+          <button class="filter-btn" data-category="시스템 이중창">
+            시스템 이중창
+          </button>
+          <button class="filter-btn" data-category="폴딩 도어">
+            폴딩 도어
+          </button>
+          <button class="filter-btn" data-category="슬라이딩 도어">
+            슬라이딩 도어
+          </button>
+          <button class="filter-btn" data-category="터닝 도어">
+            터닝 도어
+          </button>
+        </div>
+
+        <!-- Projects Grid -->
+        <div id="projectsGrid" class="projects-grid">
+          <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i> 로딩 중...
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2 style="margin: 0;">프로젝트 수정</h2>
+        <button class="modal-close" onclick="closeEditModal()">
+          <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <!-- 상태 / 메시지 -->
-      <div class="status-row">
-        <span id="statusLine" class="hidden"></span>
-        <span id="loadingState" class="hidden"></span>
-        <span id="errorState" class="hidden"></span>
-        <span id="emptyState" class="hidden"></span>
-      </div>
-    </header>
+      <form id="editForm">
+        <input type="hidden" id="editProjectId" />
 
-    <!-- 갤러리 그리드 -->
-    <section class="gallery-grid" id="galleryGrid"></section>
-
-    <!-- 무한 스크롤 로딩 표시 -->
-    <div class="scroll-loader" id="scrollLoader" class="hidden"></div>
-  </main>
-
-  <!-- 모달 -->
-  <div class="modal-backdrop" id="imageModal">
-    <div class="modal-panel">
-      <div class="modal-image-wrap">
-        <img id="modalImage" src="" alt="" />
-      </div>
-      <div class="modal-info">
-        <div class="modal-header-row">
-          <div>
-            <div class="modal-title" id="modalTitle"></div>
-            <div class="project-label" id="modalSubTitle"></div>
+        <!-- Image Upload -->
+        <div class="form-row upload-section">
+          <div class="form-group">
+            <label>대표(썸네일) 이미지 변경</label>
+            <input type="file" name="mainImageFile" accept="image/*" />
+            <div class="helper-text">새 이미지를 선택하면 기존 이미지가 교체됩니다</div>
           </div>
-          <button class="modal-close" type="button" data-close-modal>
-            ✕
+          <div class="form-group">
+            <label>상세(갤러리) 이미지 추가</label>
+            <input type="file" name="detailImageFiles" accept="image/*" multiple />
+            <div class="helper-text">기존 이미지에 추가됩니다</div>
+          </div>
+        </div>
+
+        <!-- Basic Info -->
+        <div class="form-row">
+          <div class="form-group" style="flex: 2">
+            <label>프로젝트 제목</label>
+            <input type="text" name="title" id="editTitle" required />
+          </div>
+          <div class="form-group">
+            <label>위치/현장</label>
+            <input type="text" name="location" id="editLocation" />
+          </div>
+        </div>
+
+        <!-- Category & Details -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>시공 타입</label>
+            <select name="category" id="editCategory">
+              <option value="">선택하세요</option>
+              <option value="단창">단창</option>
+              <option value="이중창 (외창 + 내창)">이중창 (외창 + 내창)</option>
+              <option value="시스템 단창">시스템 단창</option>
+              <option value="시스템 이중창">시스템 이중창</option>
+              <option value="폴딩 도어">폴딩 도어</option>
+              <option value="슬라이딩 도어">슬라이딩 도어</option>
+              <option value="터닝 도어">터닝 도어</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>준공 연도</label>
+            <input type="number" name="year" id="editYear" />
+          </div>
+          <div class="form-group">
+            <label>시공 기간</label>
+            <input type="text" name="period" id="editPeriod" />
+          </div>
+        </div>
+
+        <!-- Area -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>총 면적 (m²)</label>
+            <input type="number" name="area" id="editArea" />
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group description-group">
+          <label>설명</label>
+          <textarea name="description" id="editDescription" rows="3"></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="btn-group">
+          <button type="button" class="btn" style="background: #6b7280;" onclick="closeEditModal()">
+            취소
+          </button>
+          <button type="submit" class="btn" id="saveEditBtn">
+            <i class="fas fa-save"></i> 저장하기
           </button>
         </div>
-        <div class="modal-meta" id="modalMeta"></div>
-        <div class="modal-links" id="modalLinks"></div>
-        <div class="modal-footer-note">
-          이 모달은 관리자 전용 미리보기 화면입니다. 실제 서비스 노출 전,
-          해상도/링크를 확인하세요.
-        </div>
-      </div>
+      </form>
     </div>
   </div>
 
-  <!-- 공통 유틸리티 JS (API Fetch, 알림 등) -->
   <script src="/common.js"></script>
-
-  <!-- 갤러리 JS -->
-  <script src="/admin/admin-gallery.js" defer></script>
+  <script src="/admin/admin-gallery.js"></script>
 </body>
 
 </html>

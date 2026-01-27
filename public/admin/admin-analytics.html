@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가온 인테리어 · 방문자 통계</title>
+    <link rel="stylesheet" href="/admin/admin-projects.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        .analytics-grid {
+            display: grid;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .analytics-card h3 {
+            margin: 0 0 20px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #111827;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-container-tall {
+            height: 400px;
+        }
+
+        .top-pages-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .top-pages-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .top-pages-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+
+        .top-pages-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .page-url {
+            font-family: monospace;
+            color: #3b82f6;
+            font-size: 13px;
+        }
+
+        .visit-count {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            transition: width 0.3s;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .summary-card.green {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .summary-card.purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .summary-card.orange {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .summary-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span style="color: #3b82f6">Gaon</span> Admin
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-category">관리 메뉴</div>
+
+                <a href="/admin/dashboard" class="menu-item">
+                    <i class="fas fa-chart-pie"></i> 대시보드
+                </a>
+
+                <a href="/admin/admin-projects" class="menu-item">
+                    <i class="fas fa-hammer"></i> 현장/시공 관리
+                </a>
+
+                <a href="/admin/admin-gallery" class="menu-item">
+                    <i class="fas fa-images"></i> 갤러리 관리
+                </a>
+
+                <a href="/admin/admin-inquiries" class="menu-item">
+                    <i class="fas fa-envelope-open-text"></i> 고객 문의 관리
+                </a>
+
+                <div class="menu-category" style="margin-top: 20px">분석</div>
+                <a href="/admin/admin-analytics" class="menu-item active">
+                    <i class="fas fa-chart-line"></i> 방문자 통계
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button onclick="window.logout()" type="button" class="btn-logout-sidebar">
+                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content-wrapper">
+            <header class="header">
+                <div class="title">방문자 통계</div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">AD</div>
+                        <span>관리자님</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container">
+                <div class="page-header">
+                    <h2>웹사이트 방문 통계</h2>
+                    <p>실시간 방문자 데이터를 확인하고 분석하세요.</p>
+                </div>
+
+                <!-- 요약 통계 -->
+                <div class="stats-summary">
+                    <div class="summary-card">
+                        <div class="summary-label">오늘 방문자</div>
+                        <div class="summary-value" id="todayVisits">-</div>
+                    </div>
+
+                    <div class="summary-card green">
+                        <div class="summary-label">이번 주 방문자</div>
+                        <div class="summary-value" id="weekVisits">-</div>
+                    </div>
+
+                    <div class="summary-card purple">
+                        <div class="summary-label">이번 달 방문자</div>
+                        <div class="summary-value" id="monthVisits">-</div>
+                    </div>
+
+                    <div class="summary-card orange">
+                        <div class="summary-label">전체 방문자</div>
+                        <div class="summary-value" id="totalVisits">-</div>
+                    </div>
+                </div>
+
+                <!-- 일별 방문자 그래프 -->
+                <div class="analytics-card">
+                    <h3>
+                        <i class="fas fa-chart-line"></i>
+                        최근 14일 방문자 추이
+                    </h3>
+                    <div class="chart-container chart-container-tall">
+                        <canvas id="dailyVisitsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="analytics-grid" style="grid-template-columns: 1fr 1fr;">
+                    <!-- 인기 페이지 Top 10 -->
+                    <div class="analytics-card">
+                        <h3>
+                            <i class="fas fa-star"></i>
+                            인기 페이지 Top 10
+                        </h3>
+                        <div id="topPagesContainer">
+                            <div class="no-data">데이터를 불러오는 중...</div>
+                        </div>
+                    </div>
+
+                    <!-- 디바이스 비율 -->
+                    <div class="analytics-card">
+                        <h3>
+                            <i class="fas fa-mobile-alt"></i>
+                            디바이스 비율
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="deviceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 시간대별 방문 패턴 -->
+                <div class="analytics-card">
+                    <h3>
+                        <i class="fas fa-clock"></i>
+                        시간대별 방문 패턴
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/common.js"></script>
+    <script src="/admin/admin-analytics.js"></script>
+</body>
+
+</html>

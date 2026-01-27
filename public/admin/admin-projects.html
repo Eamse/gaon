@@ -4,13 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>가온 인테리어 · 프로젝트 관리</title>
+  <title>가온 인테리어 · 프로젝트 등록</title>
   <link rel="stylesheet" href="/admin/admin-projects.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 </head>
 
 <body>
   <div class="admin-layout">
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-logo">
         <span style="color: #3b82f6">Gaon</span> Admin
@@ -23,17 +24,21 @@
         </a>
 
         <a href="/admin/admin-projects" class="menu-item active">
-          <i class="fas fa-hammer"></i> 현장/시공 관리
+          <i class="fas fa-hammer"></i> 프로젝트 등록
         </a>
 
         <a href="/admin/admin-gallery" class="menu-item">
-          <i class="fas fa-images"></i> 갤러리 관리
+          <i class="fas fa-images"></i> 프로젝트 관리
         </a>
 
         <a href="/admin/admin-inquiries" class="menu-item">
           <i class="fas fa-envelope-open-text"></i> 고객 문의 관리
         </a>
 
+        <div class="menu-category" style="margin-top: 20px">분석</div>
+        <a href="/admin/admin-analytics" class="menu-item">
+          <i class="fas fa-chart-line"></i> 방문자 통계
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -43,9 +48,10 @@
       </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="main-content-wrapper">
       <header class="header">
-        <div class="title">프로젝트(시공사례) 관리</div>
+        <div class="title">새 프로젝트 등록</div>
         <div class="header-right">
           <div class="user-profile">
             <div class="user-avatar">AD</div>
@@ -55,59 +61,80 @@
       </header>
 
       <div class="container">
+        <!-- Page Header -->
         <div class="page-header">
-          <h2>현장 등록 및 관리</h2>
-          <p>시공 사례를 등록하고 관리하는 페이지입니다.</p>
+          <h2>새 시공사례 등록</h2>
+          <p>프로젝트 정보를 입력하여 새로운 시공사례를 등록합니다.</p>
         </div>
 
+        <!-- Info Box -->
+        <div
+          style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fas fa-info-circle" style="color: #3b82f6; font-size: 24px;"></i>
+            <div>
+              <strong style="color: #1e40af;">등록 후 프로젝트 관리</strong>
+              <p style="margin: 4px 0 0 0; color: #1e3a8a; font-size: 14px;">
+                등록된 프로젝트를 조회, 수정, 삭제하려면
+                <a href="/admin/admin-gallery"
+                  style="color: #2563eb; font-weight: 600; text-decoration: underline;">프로젝트 관리</a>
+                페이지로 이동하세요.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Form -->
         <section class="form-card">
           <div class="form-title">
-            <i class="fas fa-pen-to-square"></i> 신규 프로젝트 등록
+            <i class="fas fa-pen-to-square"></i> 프로젝트 정보 입력
           </div>
 
           <form id="createForm">
-            <input type="hidden" name="id" id="projectIdInput" />
-
+            <!-- Image Upload -->
             <div class="form-row upload-section">
               <div class="form-group">
-                <label>대표(썸네일) 이미지</label>
-                <input type="file" name="mainImageFile" accept="image/*" />
+                <label>대표(썸네일) 이미지 <span style="color: red">*</span></label>
+                <input type="file" name="mainImageFile" accept="image/*" required />
                 <div class="helper-text">목록에 표시될 대표 이미지 1장</div>
               </div>
               <div class="form-group">
                 <label>상세(갤러리) 이미지</label>
                 <input type="file" name="detailImageFiles" accept="image/*" multiple />
-                <div class="helper-text">
-                  상세 페이지에 노출될 추가 이미지 (여러 장 선택 가능)
-                </div>
+                <div class="helper-text">상세 페이지에 노출될 추가 이미지 (여러 장 선택 가능)</div>
               </div>
             </div>
 
+            <!-- Basic Info -->
             <div class="form-row">
               <div class="form-group" style="flex: 2">
                 <label>프로젝트 제목 <span style="color: red">*</span></label>
                 <input type="text" name="title" placeholder="예: 성수동 카페 리모델링" required />
               </div>
               <div class="form-group">
-                <label>위치/현장</label>
-                <input type="text" name="location" placeholder="예: 서울시 성동구" />
+                <label>위치/현장/내용</label>
+                <input type="text" name="location" placeholder="예: 서울시 성동구 / 내용 또는 공백" />
               </div>
             </div>
 
+            <!-- Category & Details -->
             <div class="form-row">
               <div class="form-group">
-                <label>시공 타입</label>
-                <select name="category">
+                <label>시공 타입 <span style="color: red">*</span></label>
+                <select name="category" required>
                   <option value="">선택하세요</option>
-                  <option value="주거공간">주거공간</option>
-                  <option value="상업공간">상업공간</option>
-                  <option value="오피스공간">오피스공간</option>
-                  <option value="리모델링">리모델링</option>
+                  <option value="단창">단창</option>
+                  <option value="이중창 (외창 + 내창)">이중창 (외창 + 내창)</option>
+                  <option value="시스템 단창">시스템 단창</option>
+                  <option value="시스템 이중창">시스템 이중창</option>
+                  <option value="폴딩 도어">폴딩 도어</option>
+                  <option value="슬라이딩 도어">슬라이딩 도어</option>
+                  <option value="터닝 도어">터닝 도어</option>
                 </select>
               </div>
               <div class="form-group">
                 <label>준공 연도</label>
-                <input type="number" name="year" placeholder="예: 2023" />
+                <input type="number" name="year" placeholder="예: 2024" />
               </div>
               <div class="form-group">
                 <label>시공 기간</label>
@@ -115,6 +142,7 @@
               </div>
             </div>
 
+            <!-- Area -->
             <div class="form-row">
               <div class="form-group">
                 <label>총 면적 (m²)</label>
@@ -122,6 +150,7 @@
               </div>
             </div>
 
+            <!-- Cost Estimation -->
             <div class="form-row cost-wrapper">
               <div class="cost-header">
                 <label class="cost-title">상세 견적 내역</label>
@@ -137,34 +166,20 @@
               </div>
             </div>
 
+            <!-- Description -->
             <div class="form-group description-group">
               <label>설명</label>
               <textarea name="description" rows="3" placeholder="프로젝트에 대한 간단한 설명"></textarea>
             </div>
 
+            <!-- Submit Button -->
             <div class="btn-group">
-              <button type="button" class="btn" id="cancelBtn" style="display: none; background: #6b7280">
-                취소
-              </button>
               <button type="submit" class="btn" id="submitBtn">
-                + 신규등록
+                <i class="fas fa-plus-circle"></i> 등록하기
               </button>
             </div>
           </form>
         </section>
-
-        <div class="list-section">
-          <div class="list-header-row">
-            <div class="form-title" style="margin-bottom: 0; border: none">
-              등록된 프로젝트 목록
-            </div>
-            <div id="categoryFilter" class="filter-group"></div>
-          </div>
-
-          <div id="projectList" class="project-list">
-            <div class="loading-msg">로딩 중...</div>
-          </div>
-        </div>
       </div>
     </main>
   </div>
