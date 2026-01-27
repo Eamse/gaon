@@ -275,7 +275,7 @@ async function fetchDashboardStats() {
     }
 
     try {
-        const data = await window.apiFetch('/admin/stats/overview');
+        const data = await window.apiFetch('/metrics/overview');
         return data;
     } catch (error) {
         console.error('API 호출 실패:', error);
