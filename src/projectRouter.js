@@ -1,48 +1,95 @@
+/**
+ * 프로젝트 관리 라우터
+ * @module projectRouter
+ */
+
 import { Router } from 'express';
-import dotenv from 'dotenv';
 import prisma from './db.js';
 import { deleteFileFromR2 } from './r2.js';
 import { protect } from './auth.js';
-import jwt from 'jsonwebtoken';
-
-dotenv.config();
+import {
+  createProjectValidation,
+  updateProjectValidation,
+  projectIdValidation,
+  validate,
+  paginationValidation,
+} from './validators.js';
+import {
+  getPagination,
+  getSortParams,
+  successResponse,
+  errorResponse,
+  handlePrismaError,
+  buildFilters,
+  paginatedResponse,
+} from './utils/api-helpers.js';
+import logger from './utils/logger.js';
 
 const router = Router();
 
-// ---------------------------
-// 프로젝트 API 라우트
-// ---------------------------
-
-// 📌 프로젝트 목록 조회 (GET /api/projects)
-router.get('/', async (req, res, next) => {
+/**
+ * GET /api/projects
+ * 프로젝트 목록 조회
+ * 
+ * @query {number} [page=1] - 페이지 번호
+ * @query {number} [limit=10] - 페이지당 항목 수
+ * @query {string} [category] - 카테고리 필터
+ * @query {string} [search] - 검색어 (제목, 위치에서 검색)
+ * @query {string} [sort=createdAt] - 정렬 기준
+ * @query {string} [order=desc] - 정렬 순서
+ * @returns {Object} 프로젝트 목록
+ */
+router.get('/', paginationValidation, validate, async (req, res, next) => {
   try {
-    // 최신순 정렬
+    const { page = 1, limit = 10, category, search, sort, order } = req.query;
+
+    // 페이지네이션
+    const { skip, take } = getPagination(page, limit);
+
+    // 정렬
+    const orderBy = getSortParams(sort, order, ['createdAt', 'updatedAt', 'title', 'year'], 'createdAt');
+
+    // 필터
+    const where = buildFilters({ category, search }, ['title', 'location', 'description']);
+
+    // 전체 개수 조회
+    const total = await prisma.project.count({ where });
+
+    // 프로젝트 목록 조회
     const projects = await prisma.project.findMany({
-      orderBy: { createdAt: 'desc' },
+      where,
+      skip,
+      take,
+      orderBy,
       include: {
-        // 대표 이미지 1장만 가져오기 (목록 표시용)
         images: {
           take: 1,
           orderBy: { createdAt: 'desc' },
         },
-        costs: true, // 견적 내역 포함
+        costs: true,
       },
     });
-    res.json({ ok: true, projects });
+
+    logger.info(`프로젝트 목록 조회: page=${page}, limit=${limit}, total=${total}`);
+
+    res.json(paginatedResponse(projects, total, page, limit));
   } catch (error) {
-    next(error);
+    logger.error(`프로젝트 목록 조회 에러: ${error.message}`);
+    const { status, message } = handlePrismaError(error);
+    next(Object.assign(new Error(message), { status }));
   }
 });
 
-// 📌 프로젝트 상세 조회 (GET /api/projects/:id)
-router.get('/:id', async (req, res, next) => {
+/**
+ * GET /api/projects/:id
+ * 프로젝트 상세 조회
+ * 
+ * @param {number} id - 프로젝트 ID
+ * @returns {Object} 프로젝트 상세 정보
+ */
+router.get('/:id', projectIdValidation, validate, async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-      const error = new Error('유효한 프로젝트 ID가 아닙니다.');
-      error.status = 400;
-      throw error;
-    }
+    const id = parseInt(req.params.id, 10);
 
     const project = await prisma.project.findUnique({
       where: { id },
@@ -50,24 +97,41 @@ router.get('/:id', async (req, res, next) => {
         images: {
           orderBy: { createdAt: 'desc' },
         },
-        costs: true, // 견적 내역 포함
+        costs: true,
       },
     });
 
     if (!project) {
-      const error = new Error('프로젝트를 찾을 수 없습니다.');
-      error.status = 404;
-      throw error;
+      logger.warn(`프로젝트 조회 실패: 존재하지 않음 (ID: ${id})`);
+      return res.status(404).json(errorResponse('프로젝트를 찾을 수 없습니다.'));
     }
 
-    res.json({ ok: true, project });
+    logger.info(`프로젝트 상세 조회: ID=${id}`);
+    res.json(successResponse(project));
   } catch (error) {
-    next(error);
+    logger.error(`프로젝트 상세 조회 에러: ${error.message}`);
+    const { status, message } = handlePrismaError(error);
+    next(Object.assign(new Error(message), { status }));
   }
 });
 
-// 📌 프로젝트 생성 (POST /api/projects)
-router.post('/', protect, async (req, res, next) => {
+/**
+ * POST /api/projects
+ * 프로젝트 생성
+ * 
+ * @body {string} title - 프로젝트 제목 (필수)
+ * @body {string} [description] - 설명
+ * @body {string} [location] - 위치
+ * @body {string} [category] - 카테고리
+ * @body {number} [year] - 연도
+ * @body {string} [period] - 기간
+ * @body {number} [area] - 면적
+ * @body {Array} [costs] - 견적 내역
+ * @body {string} [mainImage] - 대표 이미지 URL
+ * @body {Array} [images] - 이미지 목록
+ * @returns {Object} 생성된 프로젝트
+ */
+router.post('/', protect, createProjectValidation, validate, async (req, res, next) => {
   try {
     const {
       title,
@@ -77,16 +141,10 @@ router.post('/', protect, async (req, res, next) => {
       year,
       period,
       area,
-      costs, // [{ label: '철거', amount: 1000 }, ...]
+      costs,
       mainImage,
       images,
     } = req.body;
-
-    if (!title) {
-      const error = new Error('프로젝트 제목(title)은 필수입니다.');
-      error.status = 400;
-      throw error;
-    }
 
     // 견적 합계 계산
     let calculatedPrice = 0;
@@ -108,29 +166,46 @@ router.post('/', protect, async (req, res, next) => {
         year: year ? parseInt(year, 10) : null,
         period: period || '',
         area: area ? parseFloat(area) : null,
-        price: calculatedPrice, // 총액 자동 저장
+        price: calculatedPrice,
         mainImage: mainImage || null,
         images: images || undefined,
         costs: { create: costData },
       },
+      include: {
+        images: true,
+        costs: true,
+      },
     });
 
-    res.status(201).json({ ok: true, project: newProject });
+    logger.info(`프로젝트 생성: ID=${newProject.id}, title=${title}`);
+    res.status(201).json(successResponse(newProject, '프로젝트가 생성되었습니다.'));
   } catch (error) {
-    next(error);
+    logger.error(`프로젝트 생성 에러: ${error.message}`);
+    const { status, message } = handlePrismaError(error);
+    next(Object.assign(new Error(message), { status }));
   }
 });
 
-// 📌 프로젝트 수정 (PATCH /api/projects/:id)
-router.patch('/:id', protect, async (req, res, next) => {
+/**
+ * PATCH /api/projects/:id
+ * 프로젝트 수정
+ * 
+ * @param {number} id - 프로젝트 ID
+ * @body {string} [title] - 프로젝트 제목
+ * @body {string} [description] - 설명
+ * @body {string} [location] - 위치
+ * @body {string} [category] - 카테고리
+ * @body {number} [year] - 연도
+ * @body {string} [period] - 기간
+ * @body {number} [area] - 면적
+ * @body {Array} [costs] - 견적 내역
+ * @body {string} [mainImage] - 대표 이미지 URL
+ * @body {Array} [images] - 이미지 목록
+ * @returns {Object} 수정된 프로젝트
+ */
+router.patch('/:id', protect, updateProjectValidation, validate, async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-      const error = new Error('유효한 프로젝트 ID가 아닙니다.');
-      error.status = 400;
-      throw error;
-    }
-
+    const id = parseInt(req.params.id, 10);
     const {
       title,
       description,
@@ -143,137 +218,141 @@ router.patch('/:id', protect, async (req, res, next) => {
       mainImage,
       images,
     } = req.body;
+
     const dataToUpdate = {};
 
     if (title !== undefined) dataToUpdate.title = title;
     if (description !== undefined) dataToUpdate.description = description;
     if (location !== undefined) dataToUpdate.location = location;
     if (category !== undefined) dataToUpdate.category = category;
-    if (year !== undefined)
-      dataToUpdate.year = year ? parseInt(year, 10) : null;
+    if (year !== undefined) dataToUpdate.year = year ? parseInt(year, 10) : null;
     if (period !== undefined) dataToUpdate.period = period;
     if (area !== undefined) dataToUpdate.area = area ? parseFloat(area) : null;
     if (mainImage !== undefined) dataToUpdate.mainImage = mainImage;
     if (images !== undefined) dataToUpdate.images = images;
 
-    // 견적 내역 업데이트 (기존 내역 삭제 후 재생성)
+    // 견적 내역 업데이트
     if (costs !== undefined && Array.isArray(costs)) {
-      // 1. 기존 견적 삭제
       await prisma.projectCost.deleteMany({ where: { projectId: id } });
 
-      // 2. 새 견적 데이터 준비
       const costData = costs.map((c) => ({
         label: c.label,
         amount: Number(c.amount) || 0,
       }));
 
-      // 3. 데이터 업데이트 객체에 추가 (createMany는 nested update에서 지원 안될 수 있으므로 create 사용)
       dataToUpdate.costs = { create: costData };
-
-      // 4. 총액 재계산
       dataToUpdate.price = costData.reduce((sum, c) => sum + c.amount, 0);
     }
 
     if (Object.keys(dataToUpdate).length === 0) {
-      return res
-        .status(400)
-        .json({ ok: false, error: '수정할 내용이 없습니다.' });
+      return res.status(400).json(errorResponse('수정할 내용이 없습니다.'));
     }
 
     const updatedProject = await prisma.project.update({
       where: { id },
       data: dataToUpdate,
+      include: {
+        images: true,
+        costs: true,
+      },
     });
 
-    res.json({ ok: true, project: updatedProject });
+    logger.info(`프로젝트 수정: ID=${id}`);
+    res.json(successResponse(updatedProject, '프로젝트가 수정되었습니다.'));
   } catch (error) {
-    if (error.code === 'P2025') {
-      const err = new Error('프로젝트를 찾을 수 없습니다.');
-      err.status = 404;
-      return next(err);
-    }
-    next(error);
+    logger.error(`프로젝트 수정 에러: ${error.message}`);
+    const { status, message } = handlePrismaError(error);
+    next(Object.assign(new Error(message), { status }));
   }
 });
 
-// 📌 프로젝트 삭제 (DELETE /api/projects/:id)
-router.delete('/:id', protect, async (req, res, next) => {
+/**
+ * DELETE /api/projects/:id
+ * 프로젝트 삭제
+ * 
+ * @param {number} id - 프로젝트 ID
+ * @returns {Object} 삭제 성공 메시지
+ */
+router.delete('/:id', protect, projectIdValidation, validate, async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-      const error = new Error('유효한 프로젝트 ID가 아닙니다.');
-      error.status = 400;
-      throw error;
-    }
+    const id = parseInt(req.params.id, 10);
 
-    // 1. 프로젝트에 연결된 이미지 조회
+    // 프로젝트에 연결된 이미지 조회
     const images = await prisma.projectImage.findMany({
       where: { projectId: id },
     });
 
-    // 2. R2에서 이미지 파일 삭제
+    // R2에서 이미지 파일 삭제
     for (const img of images) {
-      await deleteFileFromR2(img.originalUrl);
-      await deleteFileFromR2(img.thumbUrl);
+      try {
+        await deleteFileFromR2(img.originalUrl);
+        await deleteFileFromR2(img.thumbUrl);
+      } catch (error) {
+        logger.warn(`R2 이미지 삭제 실패: ${error.message}`);
+        // R2 삭제 실패해도 계속 진행 (이미 삭제되었을 수 있음)
+      }
     }
 
-    // 3. DB에서 이미지 레코드 삭제 (Cascade 설정이 없으므로 수동 삭제)
+    // DB에서 이미지 레코드 삭제
     await prisma.projectImage.deleteMany({ where: { projectId: id } });
 
-    // 4. 프로젝트 삭제
+    // 프로젝트 삭제
     await prisma.project.delete({
       where: { id },
     });
 
-    res.json({ ok: true, message: '프로젝트가 삭제되었습니다.' });
+    logger.info(`프로젝트 삭제: ID=${id}`);
+    res.json(successResponse(null, '프로젝트가 삭제되었습니다.'));
   } catch (error) {
-    if (error.code === 'P2025') {
-      const err = new Error('프로젝트를 찾을 수 없습니다.');
-      err.status = 404;
-      return next(err);
-    }
-    next(error);
+    logger.error(`프로젝트 삭제 에러: ${error.message}`);
+    const { status, message } = handlePrismaError(error);
+    next(Object.assign(new Error(message), { status }));
   }
 });
 
-// 📌 프로젝트 개별 이미지 삭제 (DELETE /api/projects/images/:imageId)
+/**
+ * DELETE /api/projects/images/:imageId
+ * 프로젝트 개별 이미지 삭제
+ * 
+ * @param {number} imageId - 이미지 ID
+ * @returns {Object} 삭제 성공 메시지
+ */
 router.delete('/images/:imageId', protect, async (req, res, next) => {
   try {
-    const imageId = Number(req.params.imageId);
+    const imageId = parseInt(req.params.imageId, 10);
+
     if (isNaN(imageId)) {
-      const error = new Error('유효한 이미지 ID가 아닙니다.');
-      error.status = 400;
-      throw error;
+      return res.status(400).json(errorResponse('유효한 이미지 ID가 아닙니다.'));
     }
 
-    // 1. 이미지 정보 조회
+    // 이미지 정보 조회
     const image = await prisma.projectImage.findUnique({
       where: { id: imageId },
     });
 
     if (!image) {
-      const error = new Error('이미지를 찾을 수 없습니다.');
-      error.status = 404;
-      throw error;
+      return res.status(404).json(errorResponse('이미지를 찾을 수 없습니다.'));
     }
 
-    // 2. R2에서 파일 삭제
-    await deleteFileFromR2(image.originalUrl);
-    await deleteFileFromR2(image.thumbUrl);
+    // R2에서 파일 삭제
+    try {
+      await deleteFileFromR2(image.originalUrl);
+      await deleteFileFromR2(image.thumbUrl);
+    } catch (error) {
+      logger.warn(`R2 이미지 삭제 실패: ${error.message}`);
+    }
 
-    // 3. DB에서 레코드 삭제
+    // DB에서 레코드 삭제
     await prisma.projectImage.delete({
       where: { id: imageId },
     });
 
-    res.json({ ok: true, message: '이미지가 삭제되었습니다.' });
+    logger.info(`이미지 삭제: ID=${imageId}`);
+    res.json(successResponse(null, '이미지가 삭제되었습니다.'));
   } catch (error) {
-    if (error.code === 'P2025') {
-      const err = new Error('이미지를 찾을 수 없습니다.');
-      err.status = 404;
-      return next(err);
-    }
-    next(error);
+    logger.error(`이미지 삭제 에러: ${error.message}`);
+    const { status, message } = handlePrismaError(error);
+    next(Object.assign(new Error(message), { status }));
   }
 });
 

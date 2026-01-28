@@ -11,8 +11,12 @@ import projectRouter from './projectRouter.js';
 import userRouter from './userRouter.js';
 import inquiryRouter from './inquiryRouter.js';
 import metricsRouter from './metricsRouter.js';
+import logger, { httpLogger } from './utils/logger.js';
+import { loadAndValidateEnv, env } from './env-validator.js';
 
+// 환경변수 로드 및 검증 (서버 시작 전 가장 먼저 실행)
 dotenv.config();
+loadAndValidateEnv();
 
 // ---------------------------
 // PATH 설정
@@ -34,9 +38,9 @@ const DIR_THUMB = path.join(UPLOAD_DIR, 'thumb');
   if (!fs.existsSync(dir)) {
     try {
       fs.mkdirSync(dir, { recursive: true });
-      console.log(`✅ Created directory: ${dir}`);
+      logger.info(`Created directory: ${dir}`);
     } catch (err) {
-      console.error(`❌ Failed to create directory ${dir}: ${err.message}`);
+      logger.error(`Failed to create directory ${dir}: ${err.message}`);
     }
   }
 });
@@ -45,15 +49,18 @@ const DIR_THUMB = path.join(UPLOAD_DIR, 'thumb');
 // Express 기본 설정
 // ---------------------------
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = env.PORT;
 
 app.disable('x-powered-by');
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ limit: '2mb', extended: true }));
 
-const VISIT_SALT = process.env.VISIT_SALT || 'visit-salt';
-const ADMIN_BASIC_USER = process.env.ADMIN_BASIC_USER;
-const ADMIN_BASIC_PASS = process.env.ADMIN_BASIC_PASS;
+// HTTP 요청 로깅 미들웨어
+app.use(httpLogger);
+
+const VISIT_SALT = env.VISIT_SALT;
+const ADMIN_BASIC_USER = env.ADMIN_BASIC_USER;
+const ADMIN_BASIC_PASS = env.ADMIN_BASIC_PASS;
 
 const shouldLogVisit = (req) => {
   if (req.method !== 'GET') return false;
@@ -87,7 +94,7 @@ const logVisit = async (req) => {
 app.use((req, res, next) => {
   if (shouldLogVisit(req)) {
     logVisit(req).catch((err) =>
-      console.error('visit log error:', err.message || err)
+      logger.error(`Visit log error: ${err.message || err}`)
     );
   }
   next();
@@ -258,7 +265,7 @@ app.use((req, res, next) => {
 // 에러 핸들러
 // ---------------------------
 app.use((err, req, res, next) => {
-  console.error(err);
+  logger.error(`Error: ${err.message}`, { stack: err.stack });
 
   // JWT 인증 관련 에러 처리 (토큰 만료 등)
   if (err.name === 'TokenExpiredError') {
@@ -273,7 +280,7 @@ app.use((err, req, res, next) => {
     ok: false,
     error: err.message || 'Internal Server Error',
   };
-  if (process.env.NODE_ENV !== 'production' && err.stack) {
+  if (env.NODE_ENV !== 'production' && err.stack) {
     payload.stack = err.stack;
   }
   res.status(status).json(payload);
@@ -294,5 +301,7 @@ app.use((req, res) => {
 // 서버 실행
 // ---------------------------
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  logger.info(`Server is running on http://localhost:${PORT}`);
+  logger.info(`Environment: ${env.NODE_ENV}`);
+  logger.info(`API docs enabled: ${env.ENABLE_API_DOCS}`);
 });

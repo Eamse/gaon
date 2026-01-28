@@ -171,6 +171,9 @@ function createProjectCard(project) {
                 <button class="card-btn delete" onclick="deleteProject(${project.id})">
                     <i class="fas fa-trash"></i> 삭제
                 </button>
+                <button class"card-btn photo" onClick="editPhotoProject(${project.id})">
+                <i class="fas fa-edit"></i> 사진수정
+                </button>
             </div>
         </div>
     </div>
@@ -333,7 +336,7 @@ function getFormDataAndFiles(form) {
 }
 
 /**
- * 원본 데이터와 비교하여 변경 사항이 있는지 확인합니다.
+ * 원본 데이터와 비교하여 변경 사항이 있는지 확인
  */
 function hasChanges(newData, hasNewMain, hasNewDetail) {
   // 이미지가 변경되었으면 무조건 변경으로 간주
@@ -411,9 +414,6 @@ async function updateProjectMetadata(id, data, newMainImageUrl) {
   });
 }
 
-/**
- * 저장 버튼의 UI 상태를 변경합니다.
- */
 function setSavingState(isSaving) {
   if (isSaving) {
     saveEditBtn.disabled = true;
@@ -424,11 +424,7 @@ function setSavingState(isSaving) {
   }
 }
 
-/**
- * 업데이트 과정 중 발생한 에러를 처리합니다.
- */
 function handleUpdateError(error) {
-  // 백엔드에서 "수정할 내용이 없습니다"라고 응답해도 정상 종료 처리
   if (error.message && error.message.includes('수정할 내용이 없습니다')) {
     alert('수정된 내용이 없습니다.');
     closeEditModal();
@@ -441,12 +437,18 @@ function handleUpdateError(error) {
 
 
 // ============================================
+// 6-1. 사진 관리 (Photo Management)
+// ============================================
+
+window.editPhotoProject = function (id) {
+  window.location.href = `/admin/admin-gallery-photos.html?id=${id}`;
+};
+
+
+// ============================================
 // 7. 삭제 및 유틸리티 (Delete & Utils)
 // ============================================
 
-/**
- * 프로젝트를 삭제합니다.
- */
 window.deleteProject = async function (id) {
   if (!confirm('정말로 이 프로젝트를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
     return;

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>가온 인테리어 · 프로젝트 사진 관리</title>
+    <link rel="stylesheet" href="/admin/admin-projects.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        /* Photos Management Specific Styles */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        .main-image-preview {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            object-fit: cover;
+            background: #f3f4f6;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .detail-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .detail-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .detail-card .checkbox-wrapper {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 10;
+        }
+
+        .detail-card input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .upload-zone {
+            border: 2px dashed #d1d5db;
+            padding: 24px;
+            text-align: center;
+            border-radius: 8px;
+            background: #f9fafb;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span style="color: #3b82f6">Gaon</span> Admin
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-category">관리 메뉴</div>
+
+                <a href="/admin/dashboard" class="menu-item">
+                    <i class="fas fa-chart-pie"></i> 대시보드
+                </a>
+
+                <a href="/admin/admin-projects" class="menu-item">
+                    <i class="fas fa-hammer"></i> 프로젝트 등록
+                </a>
+
+                <a href="/admin/admin-gallery" class="menu-item active">
+                    <i class="fas fa-images"></i> 프로젝트 관리
+                </a>
+
+                <a href="/admin/admin-inquiries" class="menu-item">
+                    <i class="fas fa-envelope-open-text"></i> 고객 문의 관리
+                </a>
+
+                <div class="menu-category" style="margin-top: 20px">분석</div>
+                <a href="/admin/admin-analytics" class="menu-item">
+                    <i class="fas fa-chart-line"></i> 방문자 통계
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button onclick="window.logout()" type="button" class="btn-logout-sidebar">
+                    <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content-wrapper">
+            <header class="header">
+                <div class="title" style="display: flex; align-items: center; gap: 12px;">
+                    <button onclick="history.back()" style="background:none; border:none; cursor:pointer;">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    프로젝트 사진 관리
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">AD</div>
+                        <span>관리자님</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container">
+                <!-- Project Info -->
+                <div class="page-header">
+                    <h2 id="projectTitle">프로젝트 제목 로딩 중...</h2>
+                    <p>대표 이미지와 상세(갤러리) 이미지를 관리합니다.</p>
+                </div>
+
+                <div class="section-container"
+                    style="background:white; padding:24px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px;">
+                    <h3 class="section-title">대표 이미지 (Main Image)</h3>
+                    <div>
+                        <img id="mainImage" src="" class="main-image-preview" alt="Main Image" />
+                        <div style="display:flex; gap:8px;">
+                            <input type="file" id="newMainImageInput" accept="image/*" style="display:none"
+                                onchange="previewMainImage(this)" />
+                            <button class="card-btn edit" onclick="document.getElementById('newMainImageInput').click()"
+                                style="width:auto;">
+                                <i class="fas fa-upload"></i> 변경할 이미지 선택
+                            </button>
+                            <button class="card-btn" style="background:#3b82f6; color:white; width:auto;"
+                                onclick="saveMainImage()">
+                                <i class="fas fa-save"></i> 저장
+                            </button>
+                            <button class="card-btn delete" style="width:auto;" onclick="deleteMainImage()">
+                                <i class="fas fa-trash"></i> 삭제
+                            </button>
+                        </div>
+                        <p style="font-size:12px; color:#6b7280; margin-top:8px;">* 대표 이미지를 변경하려면 파일을 선택 후 [저장] 버튼을
+                            누르세요.</p>
+                    </div>
+                </div>
+
+                <div class="section-container"
+                    style="background:white; padding:24px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                    <h3 class="section-title">상세 이미지 (Gallery Images)</h3>
+
+                    <div class="actions-bar">
+                        <div>
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" />
+                            <label for="selectAll" style="margin-left:4px;">전체 선택</label>
+                        </div>
+                        <button class="btn-danger" id="btnDeleteSelected" onclick="deleteSelectedImages()">
+                            <i class="fas fa-trash"></i> 선택 삭제
+                        </button>
+                    </div>
+
+                    <div id="detailGrid" class="detail-grid">
+                        <!-- JS Rendered -->
+                    </div>
+
+                    <div class="upload-zone" onclick="document.getElementById('newDetailImagesInput').click()">
+                        <i class="fas fa-cloud-upload-alt"
+                            style="font-size:32px; color:#9ca3af; margin-bottom:8px;"></i>
+                        <p>여기를 클릭하여 상세 이미지를 추가하세요 (다중 선택 가능)</p>
+                        <input type="file" id="newDetailImagesInput" accept="image/*" multiple style="display:none"
+                            onchange="uploadDetailImages(this)" />
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="/common.js"></script>
+    <script src="/admin/admin-gallery-photos.js"></script>
+</body>
+
+</html>

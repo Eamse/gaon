@@ -149,19 +149,6 @@ async function handleFormSubmit(e) {
         }
       }
 
-      // 프로젝트 이미지 업로드 엔드포인트 사용 (woojin 방식 참고)
-      // Gaon 백엔드에 /projects/:id/images 가 구현되어 있는지 확인 필요.
-      // 구현되어 있지 않다면 /uploads 엔드포인트를 사용해야 함.
-      // 여기서는 Gaon의 기존 방식 (/uploads) 대신 Woojin 방식을 따르되, API가 없는 경우를 대비해야 함.
-      // 일단 Woojin 로직대로 /projects/:id/images 호출 시도 (구현 계획에 있었음)
-
-      // NOTE: implementation_plan.md says "I will use woojin's flow (Create Project -> Get ID -> Upload Images)".
-
-      // Check if backend supports /projects/:id/images (multipart).
-      // If not, we might need to upload via /uploads and then patch the project.
-      // However, assuming we ported backend logic or it exists, we try this.
-      // If it fails, fallback logic might be needed, but sticking to the plan.
-
       await window.apiFetch(`/projects/${projectId}/images`, {
         method: 'POST',
         body: imageFormData
