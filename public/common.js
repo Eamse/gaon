@@ -19,7 +19,7 @@ const resolveApiBase = () => {
 
   // 2) 로컬이면 기본 로컬 API 주소
   if (isLocalHost) {
-    return 'http://localhost:4000/api';
+    return 'http://localhost:4001/api';
   }
 
   // 3) 배포 환경이면 동일 도메인의 /api 사용
