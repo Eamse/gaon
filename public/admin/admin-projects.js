@@ -160,12 +160,22 @@ async function handleFormSubmit(e) {
         detailCount: detailFiles.length
       });
 
-      await window.apiFetch(`/projects/${projectId}/images`, {
+      // FormData 내용 확인
+      console.log('📦 FormData entries:');
+      for (let [key, value] of imageFormData.entries()) {
+        if (value instanceof File) {
+          console.log(`  - ${key}: ${value.name} (${value.size} bytes, ${value.type})`);
+        } else {
+          console.log(`  - ${key}: ${value}`);
+        }
+      }
+
+      const uploadResponse = await window.apiFetch(`/projects/${projectId}/images`, {
         method: 'POST',
         body: imageFormData
       });
 
-      console.log('✅ 이미지 업로드 성공!');
+      console.log('✅ 이미지 업로드 성공!', uploadResponse);
     }
 
     alert('프로젝트가 성공적으로 등록되었습니다!');

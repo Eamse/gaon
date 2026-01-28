@@ -161,6 +161,12 @@ router.post(
   ]),
   async (req, res, next) => {
     try {
+      console.log('🔍 [/projects/:projectId/images] 요청 시작');
+      console.log('  - projectId:', req.params.projectId);
+      console.log('  - req.files:', req.files);
+      console.log('  - req.body:', req.body);
+      console.log('  - Content-Type:', req.headers['content-type']);
+
       const projectId = Number(req.params.projectId);
       if (!projectId || Number.isNaN(projectId)) {
         const error = new Error('유효한 프로젝트 ID가 아닙니다.');
@@ -179,7 +185,11 @@ router.post(
           : []),
       ];
 
+      console.log('  - fileList.length:', fileList.length);
+      console.log('  - fileList:', fileList.map(f => ({ filename: f.filename, size: f.size, mimetype: f.mimetype })));
+
       if (fileList.length === 0) {
+        console.error('❌ 업로드된 파일이 없습니다!');
         const error = new Error('업로드된 파일이 없습니다.');
         error.status = 400;
         throw error;
@@ -258,12 +268,14 @@ router.post(
             path.join(DIR_MEDIUM, filename),
             path.join(DIR_THUMB, filename),
           ];
-          return Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
+          return Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
         })
       );
 
+      console.log('✅ [/projects/:projectId/images] 업로드 완료:', results.length, '개 파일');
       return res.json({ ok: true, count: results.length, items: results });
     } catch (error) {
+      console.error('❌ [/projects/:projectId/images] 에러:', error.message);
       return next(error);
     }
   }
@@ -406,7 +418,7 @@ router.post(
         path.join(DIR_MEDIUM, file.filename),
         path.join(DIR_THUMB, file.filename),
       ];
-      await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
+      await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
 
       return res.status(201).json({ ok: true, item: imageRecord });
     } catch (error) {
@@ -483,7 +495,7 @@ router.post(
           path.join(DIR_MEDIUM, file.filename),
           path.join(DIR_THUMB, file.filename),
         ];
-        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
+        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
       }
 
       return res
@@ -747,7 +759,7 @@ router.post(
           path.join(DIR_MEDIUM, file.filename),
           path.join(DIR_THUMB, file.filename),
         ];
-        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
+        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
       }
 
       return res
