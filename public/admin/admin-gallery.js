@@ -108,7 +108,8 @@ function createProjectCard(project) {
   // Assuming backend returns full URL or valid relative URL.
 
   // Fallback image
-  const fallbackImg = 'https://via.placeholder.com/300x200?text=No+Image';
+  // Fallback image (Base64 gray placeholder to prevent network errors)
+  const fallbackImg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTFZTJlIiAvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZlNzI3ZiIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
 
   return `
         <div class="project-card">
@@ -116,7 +117,7 @@ function createProjectCard(project) {
                 src="${imgUrl || fallbackImg}" 
                 alt="${escapeHtml(project.title)}" 
                 class="card-image"
-                onerror="this.src='${fallbackImg}'"
+                onerror="this.onerror=null; this.src='${fallbackImg}';"
             />
             <div class="card-content">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
@@ -240,6 +241,13 @@ async function handleEditSubmit(e) {
     await loadAllProjects();
 
   } catch (error) {
+    // "No content to modify" specific handling
+    if (error.message && error.message.includes('수정할 내용이 없습니다')) {
+      alert('수정된 내용이 없습니다.');
+      closeEditModal();
+      return;
+    }
+
     console.error('❌ Error updating project:', error);
     alert('수정 중 오류가 발생했습니다: ' + error.message);
   } finally {
