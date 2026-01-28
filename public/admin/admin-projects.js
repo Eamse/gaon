@@ -122,9 +122,11 @@ async function handleFormSubmit(e) {
       body: payload
     });
 
-    const projectId = projectRes.project ? projectRes.project.id : projectRes.id;
+    // 백엔드가 { ok: true, data: { id: ..., ... } } 형식으로 반환
+    const projectId = projectRes.data?.id;
 
     if (!projectId) {
+      console.error('응답:', projectRes);
       throw new Error('프로젝트 ID를 받지 못했습니다.');
     }
 
