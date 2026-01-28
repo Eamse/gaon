@@ -17,6 +17,7 @@ const editForm = document.getElementById('editForm');
 const saveEditBtn = document.getElementById('saveEditBtn');
 
 // Initialize
+
 document.addEventListener('DOMContentLoaded', () => {
   initGallery();
 });
@@ -159,12 +160,16 @@ window.previewProject = function (id) {
 // Edit Modal
 // ============================================
 
+let originalDate = null;
+
 window.openEditModal = async function (id) {
   currentEditId = id;
 
   try {
     const data = await window.apiFetch(`/projects/${id}`);
     const project = data.project;
+
+    originalDate = JSON.stringify(project);
 
     // Fill form
     document.getElementById('editProjectId').value = project.id;
@@ -191,6 +196,7 @@ window.closeEditModal = function () {
   currentEditId = null;
 };
 
+// Submit Handler (저장 버튼 클릭 시)
 async function handleEditSubmit(e) {
   e.preventDefault();
 
@@ -199,37 +205,29 @@ async function handleEditSubmit(e) {
     return;
   }
 
+  const formData = new FormData(editForm);
+  const newTitle = formData('title');
+  const newLocation = formData('location');
+  const newDescription = formData('description');
+
+  const mainImageFile = formData.get('mainImageFile');
+  const hasNewImage = mainImageFile && mainImageFile.size > 0;
+
+  const isTitleSame = newTitle === (originalProjectData.title || '');
+  const isLocationSame = newLocation === (originalProjectData.location || '');
+  const isDescSame = newDescription === (originalProjectData.description || '');
+
+  if (isTitleSame && isLocationSame && isDescSame && !hasNewImage) {
+    alret('수정된 내용이 없습니다.');
+    return;
+  }
+
   saveEditBtn.disabled = true;
   saveEditBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 저장 중...';
 
   try {
-    const formData = new FormData(editForm);
-
-    // costs 필드 추가 (수정 시 빈 배열 전송하여 유지 - Woojin 방식)
+    const originalCosts = originalProjectData.costs || [];
     formData.append('costs', JSON.stringify([]));
-
-    // window.apiFetch does NOT support FormData body directly in the wrapper provided in common.js? 
-    // Wait, typical apiFetch wrappers might handle it if they check instanceof FormData.
-    // If common.js apiFetch sets Content-Type to json by default, it might break FormData.
-    // Let's assume window.apiFetch supports it or we need to use fetch directly if not.
-    // Checking previous code: User context says "admin-woojin/admin-projects.js uses fetch, not window.apiFetch".
-    // But Gaon's structure uses window.apiFetch.
-    // Common.js typically handles this. If body is FormData, don't set Content-Type to JSON.
-
-    // Let's assume standard behavior. If common.js is simple, we might need manual fetch.
-    // To be safe, I'll use window.apiFetch but ensure it can handle FormData.
-    // If it fails, I'll need to check common.js.
-
-    // Actually, in `admin-projects.js` (CREATE), I used apiFetch with object payload (JSON).
-    // Here I am sending FormData to PATCH /projects/:id.
-    // Backend `projectRouter.js` usually expects JSON for PATCH unless using multer?
-    // Wait, Woojin `admin-projects.js` used FormData for create, but JSON for PATCH mainImage?
-    // Ah, Woojin `admin-projects.js` handleFormSubmit uses `JSON.stringify` for project data, and SEPARATE FormData for images.
-    // BUT Woojin `admin-gallery-manage.js` (Step 46 file view) uses FormData for PATCH!
-    // `body: formData` (Line 248).
-    // So the backend might support multipart/form-data for PATCH.
-
-    // Let's proceed with FormData.
 
     await window.apiFetch(`/projects/${currentEditId}`, {
       method: 'PATCH',
@@ -241,7 +239,6 @@ async function handleEditSubmit(e) {
     await loadAllProjects();
 
   } catch (error) {
-    // "No content to modify" specific handling
     if (error.message && error.message.includes('수정할 내용이 없습니다')) {
       alert('수정된 내용이 없습니다.');
       closeEditModal();
