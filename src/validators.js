@@ -76,18 +76,51 @@ export const createProjectValidation = [
 
     body('year')
         .optional()
-        .isInt({ min: 1900, max: 2100 })
-        .withMessage('연도는 1900-2100 사이의 숫자여야 합니다.'),
+        .customSanitizer(value => {
+            // 숫자 또는 문자열 숫자를 정수로 변환
+            if (value === null || value === undefined || value === '') return null;
+            const num = typeof value === 'number' ? value : parseInt(value, 10);
+            return isNaN(num) ? null : num;
+        })
+        .custom(value => {
+            if (value === null) return true; // optional이므로 null 허용
+            if (value < 1900 || value > 2100) {
+                throw new Error('연도는 1900-2100 사이여야 합니다.');
+            }
+            return true;
+        }),
 
     body('area')
         .optional()
-        .isFloat({ min: 0 })
-        .withMessage('면적은 0 이상의 숫자여야 합니다.'),
+        .customSanitizer(value => {
+            // 숫자 또는 문자열 숫자를 실수로 변환
+            if (value === null || value === undefined || value === '') return null;
+            const num = typeof value === 'number' ? value : parseFloat(value);
+            return isNaN(num) ? null : num;
+        })
+        .custom(value => {
+            if (value === null) return true; // optional이므로 null 허용
+            if (value < 0) {
+                throw new Error('면적은 0 이상이어야 합니다.');
+            }
+            return true;
+        }),
 
     body('price')
         .optional()
-        .isInt({ min: 0 })
-        .withMessage('가격은 0 이상의 정수여야 합니다.'),
+        .customSanitizer(value => {
+            // 숫자 또는 문자열 숫자를 정수로 변환
+            if (value === null || value === undefined || value === '') return null;
+            const num = typeof value === 'number' ? value : parseInt(value, 10);
+            return isNaN(num) ? null : num;
+        })
+        .custom(value => {
+            if (value === null) return true; // optional이므로 null 허용
+            if (value < 0) {
+                throw new Error('가격은 0 이상이어야 합니다.');
+            }
+            return true;
+        }),
 ];
 
 /**
