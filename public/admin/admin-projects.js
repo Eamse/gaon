@@ -176,18 +176,6 @@ async function handleFormSubmit(e) {
       });
 
       console.log('✅ 이미지 업로드 성공!', uploadResponse);
-
-      // 업로드된 이미지 중 첫 번째를 대표 이미지로 설정
-      if (uploadResponse.items && uploadResponse.items.length > 0) {
-        const firstImageUrl = uploadResponse.items[0].urls.medium || uploadResponse.items[0].urls.original;
-
-        await window.apiFetch(`/projects/${projectId}`, {
-          method: 'PATCH',
-          body: { mainImage: firstImageUrl }
-        });
-
-        console.log('✅ 대표 이미지 설정 완료:', firstImageUrl);
-      }
     }
 
     alert('프로젝트가 성공적으로 등록되었습니다!');

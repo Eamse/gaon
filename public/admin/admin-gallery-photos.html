@@ -70,27 +70,8 @@
             align-items: center;
         }
 
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+        /* btn-danger and btn-secondary styles removed - using global styles */
 
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
 
         .upload-zone {
             border: 2px dashed #d1d5db;
@@ -151,7 +132,7 @@
         <main class="main-content-wrapper">
             <header class="header">
                 <div class="title" style="display: flex; align-items: center; gap: 12px;">
-                    <button onclick="history.back()" style="background:none; border:none; cursor:pointer;">
+                    <button onclick="history.back()" class="btn-back-nav" type="button">
                         <i class="fas fa-arrow-left"></i>
                     </button>
                     프로젝트 사진 관리
@@ -205,7 +186,7 @@
                             <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" />
                             <label for="selectAll" style="margin-left:4px;">전체 선택</label>
                         </div>
-                        <button class="btn-danger" id="btnDeleteSelected" onclick="deleteSelectedImages()">
+                        <button class="card-btn delete" id="btnDeleteSelected" onclick="deleteSelectedImages()">
                             <i class="fas fa-trash"></i> 선택 삭제
                         </button>
                     </div>

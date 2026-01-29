@@ -118,7 +118,7 @@ const applyFormat = (pipeline, format, quality) => {
 
 const generateSizesToDisk = async (sourcePath, filename) => {
   const format = path.extname(filename).replace('.', '').toLowerCase();
-  const baseImage = sharp(sourcePath).rotate();
+  const baseImage = sharp(sourcePath, { failOnError: false }).rotate();
 
   const targets = [
     { width: 1600, quality: 82, dir: DIR_LARGE, key: 'large' },
@@ -230,7 +230,7 @@ router.post(
           ),
         ]);
 
-        const meta = await sharp(srcPath).metadata();
+        const meta = await sharp(srcPath, { failOnError: false }).metadata();
 
         const imageRecord = await prisma.projectImage.create({
           data: {
@@ -368,7 +368,7 @@ router.post(
       const originalPath = path.join(DIR_ORIGINAL, file.filename);
       await generateSizesToDisk(originalPath, file.filename); // 로컬에 리사이즈된 이미지 생성
 
-      const meta = await sharp(originalPath).metadata();
+      const meta = await sharp(originalPath, { failOnError: false }).metadata();
 
       // R2에 업로드
       const contentType = file.mimetype || 'image/jpeg';
@@ -445,7 +445,7 @@ router.post(
         const originalPath = path.join(DIR_ORIGINAL, file.filename);
         await generateSizesToDisk(originalPath, file.filename); // 로컬에 리사이즈된 이미지 생성
 
-        const meta = await sharp(originalPath).metadata();
+        const meta = await sharp(originalPath, { failOnError: false }).metadata();
 
         // R2에 업로드
         const contentType = file.mimetype || 'image/jpeg';
@@ -690,7 +690,7 @@ router.post(
         const originalPath = path.join(DIR_ORIGINAL, file.filename);
         await generateSizesToDisk(originalPath, file.filename); // 로컬에 리사이즈된 이미지 생성
 
-        const meta = await sharp(originalPath).metadata();
+        const meta = await sharp(originalPath, { failOnError: false }).metadata();
 
         // AdminGalleryImage는 id를 파일명에 포함시키기 위해 먼저 생성하고 id를 얻어옴
         // R2 키는 AdminImage의 id와 AdminGalleryImage의 id를 조합하여 고유하게 만듭니다.

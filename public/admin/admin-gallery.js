@@ -172,8 +172,8 @@ function createProjectCard(project) {
                 <button class="card-btn delete" onclick="deleteProject(${project.id})">
                     <i class="fas fa-trash"></i> 삭제
                 </button>
-                <button class"card-btn photo" onClick="editPhotoProject(${project.id})">
-                <i class="fas fa-edit"></i> 사진수정
+                <button class="card-btn photo" onclick="editPhotoProject(${project.id})">
+                    <i class="fas fa-camera"></i> 사진수정
                 </button>
             </div>
         </div>
