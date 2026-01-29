@@ -190,7 +190,8 @@ const API_BASE = resolveApiBase();
       if (!res.ok) throw new Error('목록 조회 실패');
 
       const data = await res.json();
-      const projects = data.projects || [];
+      // 백엔드가 { ok: true, data: [...] } 형태로 반환
+      const projects = data.data || [];
 
       // 3) 응답 -> state.items로 변환
       state.items = projects.map((p) => {

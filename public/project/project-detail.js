@@ -321,7 +321,8 @@
     }
 
     const data = await res.json();
-    return data.project;
+    // 백엔드가 { ok: true, data: {...} } 형태로 반환
+    return data.data;
   };
 
   /**

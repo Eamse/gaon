@@ -71,7 +71,8 @@ async function initProjectSwiper() {
 
   try {
     const data = await fetchProjects();
-    const projects = data.projects || [];
+    // 백엔드가 { ok: true, data: [...] } 형태로 반환
+    const projects = data.data || [];
 
     const validProjects = projects
       .filter((p) => p.mainImage || (p.images && p.images.length > 0))

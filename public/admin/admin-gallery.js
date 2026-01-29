@@ -77,7 +77,8 @@ function setupFilterButtons() {
 async function loadAllProjects() {
   try {
     const data = await window.apiFetch('/projects');
-    allProjects = data.projects || [];
+    // 백엔드가 { ok: true, data: [...], pagination: {...} } 형태로 반환
+    allProjects = data.data || [];
 
     console.log(`✅ Loaded ${allProjects.length} projects`);
     renderProjects();
@@ -203,7 +204,8 @@ window.openEditModal = async function (id) {
   try {
     // 최신 데이터 가져오기
     const data = await window.apiFetch(`/projects/${id}`);
-    const project = data.project;
+    // 백엔드가 { ok: true, data: {...} } 형태로 반환
+    const project = data.data;
 
     // 변경 감지를 위해 원본 데이터 저장
     originalProjectData = project;
