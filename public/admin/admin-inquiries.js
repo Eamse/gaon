@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // 4. 데이터 로드 함수
 async function fetchInquiries() {
   try {
-    const data = await window.apiFetch('/inquiries');
-    allInquiries = data.inquiries || [];
+    const response = await window.apiFetch('/inquiries');
+    allInquiries = response.data || [];
     selectedIds.clear();
 
     updateStats(); // 통계 갱신
