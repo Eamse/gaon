@@ -148,16 +148,18 @@ function createProjectCard(project) {
 
   return `
     <div class="project-card" data-id="${project.id}">
-      <div class="project-checkbox">
-        <input type="checkbox" class="check-box"
-          ${isChecked} onchange="projectSelected(${project.id})" />
-      </div>
-         <img 
+      <div class="card-image-wrapper" style="position: relative;">
+        <div class="project-checkbox">
+          <input type="checkbox" class="check-box"
+            ${isChecked} onchange="projectSelected(${project.id})" />
+        </div>
+        <img 
             src="${imgUrl || fallbackImg}" 
             alt="${escapeHtml(project.title)}" 
             class="card-image"
             onerror="this.onerror=null; this.src='${fallbackImg}';"
         />
+      </div>
         <div class="card-content">
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                 <h3 class="card-title">${escapeHtml(project.title)}</h3>
