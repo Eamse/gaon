@@ -167,7 +167,7 @@ function createProjectCard(project) {
                     <i class="fas fa-eye"></i> 미리보기
                 </button>
                 <button class="card-btn edit" onclick="openEditModal(${project.id})">
-                    <i class="fas fa-edit"></i> 수정
+                    <i class="fas fa-edit"></i> 정보수정
                 </button>
                 <button class="card-btn delete" onclick="deleteProject(${project.id})">
                     <i class="fas fa-trash"></i> 삭제
