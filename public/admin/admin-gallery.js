@@ -26,7 +26,6 @@ const editModal = document.getElementById('editModal');
 const editForm = document.getElementById('editForm');
 const saveEditBtn = document.getElementById('saveEditBtn');
 
-
 // ============================================
 // 2. 초기화 (Initialization)
 // ============================================
@@ -128,10 +127,13 @@ function renderProjects() {
   projectsGrid.innerHTML = filtered.map(project => createProjectCard(project)).join('');
 }
 
-/**
- * 개별 프로젝트 카드 HTML을 생성합니다.
- */
+// ============================================
+// 개별 프로젝트 카드 HTML을 생성
+// ============================================
+const selectedProjectIds = new Set();
+
 function createProjectCard(project) {
+  const isChecked = selectedProjectIds.has(project.id) ? 'checked' : '';
   // 이미지 URL 결정 (대표 이미지 > 첫 번째 이미지 > 폴백 이미지)
   let imgUrl = '';
   if (project.mainImage) {
@@ -145,8 +147,12 @@ function createProjectCard(project) {
   const fallbackImg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTFZTJlIiAvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZlNzI3ZiIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
 
   return `
-    <div class="project-card">
-        <img 
+    <div class="project-card" data-id="${project.id}">
+      <div class="project-checkbox">
+        <input type="checkbox" class="check-box"
+          ${isChecked} onchange="projectSelected(${project.id})" />
+      </div>
+         <img 
             src="${imgUrl || fallbackImg}" 
             alt="${escapeHtml(project.title)}" 
             class="card-image"
@@ -180,6 +186,26 @@ function createProjectCard(project) {
     </div>
   `;
 }
+
+// ... (skipping middle parts) ...
+
+window.selectedProjectAll = function (mainCheckbox) {
+  const allCheckboxes = document.querySelectorAll('.check-box'); // .project-checkbox -> .check-box 수정
+  const isChecked = mainCheckbox.checked;
+
+  allCheckboxes.forEach(cb => {
+    // 이미 체크된 상태와 다를 경우에만 처리 (중복 추가 방지)
+    if (cb.checked !== isChecked) {
+      cb.checked = isChecked;
+      const card = cb.closest('.project-card');
+      if (card && card.dataset.id) {
+        const id = parseInt(card.dataset.id);
+        isChecked ? selectedProjectIds.add(id) : selectedProjectIds.delete(id);
+      }
+    }
+  });
+  updateSelectionUI();
+};
 
 
 // ============================================
@@ -470,9 +496,71 @@ window.deleteProject = async function (id) {
   }
 };
 
+// ============================================
+// 선택삭제
+// ============================================
+window.projectSelected = function (id) {
+  if (selectedProjectIds.has(id)) {
+    selectedProjectIds.delete(id);
+  } else {
+    selectedProjectIds.add(id);
+  }
+  updateSelectionUI();
+};
+
+function updateSelectionUI() {
+  const deleteBtn = document.getElementById('batchDeleteBtn');
+  const countDisplay = document.getElementById('selectedCount');
+
+  if (deleteBtn) {
+    deleteBtn.disabled = selectedProjectIds.size === 0;
+  }
+  if (countDisplay) {
+    countDisplay.textContent = selectedProjectIds.size;
+  }
+}
+
 /**
- * HTML 특수문자를 이스케이프 처리하여 XSS 방지
+ * 선택된 프로젝트 일괄 삭제
  */
+window.batchDeleteProjects = async function () {
+  const count = selectedProjectIds.size;
+  if (count === 0) return;
+
+  if (!confirm(`선택한 ${count}개의 프로젝트를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+    return;
+  }
+
+  try {
+    const ids = Array.from(selectedProjectIds);
+
+    // 병렬로 삭제 요청 수행
+    const deletePromises = ids.map(id =>
+      window.apiFetch(`/projects/${id}`, { method: 'DELETE' })
+    );
+
+    await Promise.all(deletePromises);
+
+    alert('선택한 프로젝트가 삭제되었습니다.');
+
+    // 선택 초기화 및 목록 갱신
+    selectedProjectIds.clear();
+    updateSelectionUI();
+    await loadAllProjects();
+
+  } catch (error) {
+    console.error('❌ Error batch deleting projects:', error);
+    alert('일부 프로젝트 삭제 중 오류가 발생했습니다: ' + error.message);
+
+    await loadAllProjects();
+  }
+};
+
+
+
+// ============================================
+// HTML 특수문자를 이스케이프 처리하여 XSS 방지
+// ============================================
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;

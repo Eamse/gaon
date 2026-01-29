@@ -171,6 +171,19 @@
           </button>
         </div>
 
+        <!-- Bulk Actions -->
+        <div class="bulk-actions"
+          style="margin-bottom: 16px; display: flex; align-items: center; gap: 12px; min-height: 40px;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-right: 8px;">
+            <input type="checkbox" id="selectAllCheckbox" onchange="selectedProjectAll(this)"
+              style="width: 18px; height: 18px; cursor: pointer;">
+            <label for="selectAllCheckbox" style="cursor: pointer; font-weight: 600; color: #4b5563;">전체 선택</label>
+          </div>
+          <button id="batchDeleteBtn" class="card-btn delete" onclick="batchDeleteProjects()" disabled>
+            <i class="fas fa-trash"></i> 선택 삭제 (<span id="selectedCount">0</span>)
+          </button>
+        </div>
+
         <!-- Projects Grid -->
         <div id="projectsGrid" class="projects-grid">
           <div class="loading-state">
