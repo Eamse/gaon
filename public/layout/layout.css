@@ -70,7 +70,7 @@ a {
   height: 6rem;
   width: 100%;
   z-index: 1001;
-  background: white;
+  background: #f8f9fa;
   border-bottom: 1px solid rgba(214, 195, 165, 0.4);
 }
 
@@ -94,22 +94,20 @@ a {
   align-items: center;
 }
 
-.header-menu-title:hover > a::after {
+.header-menu-title:hover>a::after {
   transform: scaleX(1);
 }
 
-.header-menu-title > a::after {
+.header-menu-title>a::after {
   content: '';
   position: absolute;
   left: 0;
   bottom: -10px;
   width: 100%;
   height: 2px;
-  background: linear-gradient(
-    135deg,
-    rgba(31, 54, 154, 0.3),
-    rgba(214, 195, 165, 0.6)
-  );
+  background: linear-gradient(135deg,
+      rgba(31, 54, 154, 0.3),
+      rgba(214, 195, 165, 0.6));
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.3s ease;
@@ -123,7 +121,7 @@ a {
   pointer-events: auto;
 }
 
-.header-menu-title > a {
+.header-menu-title>a {
   position: relative;
   font-size: 0.95rem;
   letter-spacing: 0.18em;
@@ -226,6 +224,7 @@ a {
   opacity: 0.6;
   transition: opacity 0.2s;
 }
+
 .contact-logo:hover {
   opacity: 1;
 }
@@ -267,7 +266,8 @@ a {
 /* 기본 카드 스타일 (PC) */
 .img-card {
   flex: 0 0 auto;
-  width: 500px; /* PC 너비 */
+  width: 500px;
+  /* PC 너비 */
   height: 300px;
   margin-right: 20px;
   overflow: hidden;
@@ -296,15 +296,18 @@ a {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: none; /* 검은색 그라데이션 제거 */
+  background: none;
+  /* 검은색 그라데이션 제거 */
   color: #fff;
   padding: 12px 16px;
   font-size: 1.2rem;
-  font-family: var(--font-family); /* 정의하신 변수 사용 */
+  font-family: var(--font-family);
+  /* 정의하신 변수 사용 */
 }
 
 .fixed-nav-wrapper {
-  display: none; /* PC/태블릿 기본 숨김 */
+  display: none;
+  /* PC/태블릿 기본 숨김 */
 }
 
 /* ---------------------- */
@@ -331,19 +334,23 @@ a {
     pointer-events: none;
     margin: 0;
   }
+
   .mobile-menu-list.active {
     transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
   }
+
   .mobile-toggle {
     display: block;
   }
+
   .header-menu-title {
     padding: 14px 28px;
     border-bottom: 1px solid rgba(16, 20, 31, 0.06);
     align-items: center;
   }
+
   .menu-items {
     margin-right: 0;
   }
@@ -352,14 +359,17 @@ a {
 /* [수정] 모바일 전용 (하단바 및 푸터 정렬) */
 @media screen and (max-width: 767px) {
   .img-card {
-    width: 280px; /* 모바일에서 적당한 너비로 축소 */
-    height: 180px; /* 높이도 비율에 맞춰 축소 */
+    width: 280px;
+    /* 모바일에서 적당한 너비로 축소 */
+    height: 180px;
+    /* 높이도 비율에 맞춰 축소 */
     margin-right: 15px;
   }
 
   .project-overlay {
     padding: 12px;
-    font-size: 1rem; /* 글자 크기 축소 */
+    font-size: 1rem;
+    /* 글자 크기 축소 */
   }
 
   .header-menu {
@@ -407,17 +417,20 @@ a {
   .nav-btn i {
     font-size: 18px;
   }
+
   .nav-btn:hover,
   .nav-btn.free {
     color: #1f369a;
   }
+
   .nav-btn.free {
     font-weight: 700;
   }
 
   /* 푸터 모바일 정렬 */
   .gaon-info {
-    padding: 40px 20px 85px; /* 하단바 두께 고려 여백 */
+    padding: 40px 20px 85px;
+    /* 하단바 두께 고려 여백 */
   }
 
   .footer-inner {
@@ -425,7 +438,8 @@ a {
   }
 
   .footer-top-row {
-    justify-content: space-between; /* 로고와 SNS가 양옆으로 나란히 */
+    justify-content: space-between;
+    /* 로고와 SNS가 양옆으로 나란히 */
     gap: 12px;
   }
 
@@ -450,9 +464,11 @@ a {
   .header-menu {
     margin: 10px 5px 0;
   }
+
   .brand-tagline {
     font-size: 0.5rem;
   }
+
   .brand-name {
     font-size: 1.2rem;
   }
@@ -465,16 +481,19 @@ a {
   border-top: 1px solid #eee;
   overflow: hidden;
 }
+
 .rolling-track {
   display: flex;
   gap: 60px;
   animation: scrollRolling 30s linear infinite;
   width: max-content;
 }
+
 @keyframes scrollRolling {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
