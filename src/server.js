@@ -180,6 +180,68 @@ app.use(
   })
 );
 
+// ---------------------------
+// SSR-Lite: 프로젝트 상세 페이지 동적 메타 태그 처리
+// ---------------------------
+app.get('/project/project-detail.html', async (req, res, next) => {
+  const projectId = parseInt(req.query.id);
+  // ID가 없거나 유효하지 않으면 정적 파일 서빙으로 넘어감
+  if (!projectId || isNaN(projectId)) {
+    return next();
+  }
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+    });
+
+    // 프로젝트가 없으면 정적 파일 서빙 (Client-side에서 "존재하지 않음" 처리하도록)
+    if (!project) return next();
+
+    // HTML 파일 읽기
+    const filePath = path.join(PUBLIC_DIR, 'project', 'project-detail.html');
+    let html = await fs.promises.readFile(filePath, 'utf-8');
+
+    // 메타 데이터 생성
+    const title = `${project.title} · 가온 인테리어`;
+    const description = `${project.location || '경기'} ${project.area ? project.area + '평' : ''} ${project.category || '인테리어'} 프로젝트 시공사례입니다.`;
+
+    // 이미지 URL 처리 (절대 경로로 변환)
+    let imageUrl = project.mainImage || 'https://gaoninterior.kr/public/image/logo.png';
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      // 이미지 경로가 /로 시작하면 제거 (중복 방지)
+      const cleanPath = imageUrl.startsWith('/') ? imageUrl.slice(1) : imageUrl;
+      imageUrl = `https://gaoninterior.kr/${cleanPath}`;
+    }
+
+    // HTML 내 메타 태그 교체 (Regex 사용)
+    // 1. Title
+    html = html.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
+    html = html.replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${title}" />`);
+
+    // 2. Description
+    html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${description}" />`);
+    html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${description}" />`); // og:description이 없을 수도 있으니 주의
+
+    // 3. Image
+    html = html.replace(/<meta property="og:image" content=".*?" \/>/, `<meta property="og:image" content="${imageUrl}" />`);
+
+    // 4. URL
+    const canonicalUrl = `https://gaoninterior.kr/project/project-detail.html?id=${projectId}`;
+    html = html.replace(/<meta property="og:url" content=".*?" \/>/, `<meta property="og:url" content="${canonicalUrl}" />`);
+    // Canonical 태그가 있다면 교체
+    html = html.replace(/<link rel="canonical" href=".*?" \/>/, `<link rel="canonical" href="${canonicalUrl}" />`);
+
+    // 수정된 HTML 전송
+    res.send(html);
+
+  } catch (err) {
+    logger.error(`SSR Error for project ${projectId}: ${err.message}`);
+    // 에러 발생 시에도 안전하게 정적 파일 서빙으로 폴백
+    next();
+  }
+});
+
 app.use(express.static(PUBLIC_DIR));
 
 // ---------------------------

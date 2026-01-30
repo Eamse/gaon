@@ -195,9 +195,15 @@
 
     if (project.images && project.images.length > 0) {
       const existingUrls = new Set(galleryItems.map((img) => img.originalUrl));
-      project.images.forEach((img) => {
+      project.images.forEach((img, index) => {
         if (!existingUrls.has(img.originalUrl)) {
-          galleryItems.push(img);
+          // SEO: 더 구체적인 Alt 태그 생성 (프로젝트 제목 + 공간 설명 + 번호)
+          const altText = img.alt || `${project.title} - ${project.category || '인테리어'} 상세 이미지 ${index + 1}`;
+
+          galleryItems.push({
+            ...img,
+            alt: altText
+          });
         }
       });
     }

@@ -5,10 +5,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>가온 인테리어</title>
+  <meta name="description" content="가온 인테리어 - 당신의 라이프스타일을 완성하는 럭셔리 인테리어 디자인 전문 그룹. 산본, 안양, 경기 지역 아파트 리모델링 전문." />
+  <meta name="keywords" content="인테리어, 리모델링, 아파트인테리어, 산본인테리어, 안양인테리어, 경기인테리어, 상업공간, 가온인테리어, 고급인테리어" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://gaoninterior.kr/" />
+  <meta property="og:title" content="가온 인테리어 | Timeless Luxury Design" />
+  <meta property="og:description" content="당신의 라이프스타일을 완성하는 럭셔리 인테리어 디자인 전문 그룹" />
+  <meta property="og:image" content="https://gaoninterior.kr/public/image/interior-design(bed).png" />
+  <meta property="og:site_name" content="가온 인테리어" />
+  <meta property="og:locale" content="ko_KR" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://gaoninterior.kr" />
   <link rel="stylesheet" href="/index.css" />
   <link rel="stylesheet" href="/layout/layout.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <script src="https://kit.fontawesome.com/0018d0d2c3.js" crossorigin="anonymous" defer></script>
+
+  <!-- Structured Data (JSON-LD) for Organization -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "가온 인테리어",
+      "url": "https://gaoninterior.kr",
+      "logo": "https://gaoninterior.kr/public/image/logo.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+82-10-1234-5678",
+        "contactType": "customer service",
+        "areaServed": ["KR", "Gyeonggi-do", "Seoul"],
+        "availableLanguage": "Korean"
+      },
+      "sameAs": [
+        "https://instagram.com/gaoninterior",
+        "https://blog.naver.com/gaoninterior"
+      ]
+    }
+  </script>
 </head>
 
 <body id="top">
@@ -19,7 +55,7 @@
       <div class="swiper-wrapper">
         <div class="swiper-slide">
           <div class="hero-img-box">
-            <img src="/image/interior-design(bed).png" alt="Dark Modern Bedroom" />
+            <img src="/image/interior-design(bed).png" alt="Dark Modern Bedroom" fetchpriority="high" />
             <div class="hero-text-content">
               <h2 class="hero-title">Dark Modern Serenity</h2>
               <p class="hero-subtitle">
@@ -31,7 +67,7 @@
 
         <div class="swiper-slide">
           <div class="hero-img-box">
-            <img src="/image/luxurious-Kitchen.png" alt="Bright Luxury Kitchen" />
+            <img src="/image/luxurious-Kitchen.png" alt="Bright Luxury Kitchen" loading="lazy" />
             <div class="hero-text-content">
               <h2 class="hero-title">Timeless Bright Luxury</h2>
               <p class="hero-subtitle">
@@ -43,7 +79,7 @@
 
         <div class="swiper-slide">
           <div class="hero-img-box">
-            <img src="/image/RoomCinema.png" alt="Private Cinema" />
+            <img src="/image/RoomCinema.png" alt="Private Cinema" loading="lazy" />
             <div class="hero-text-content">
               <h2 class="hero-title">The Ultimate Private Cinema</h2>
               <p class="hero-subtitle">
@@ -82,7 +118,7 @@
       <div class="about-visual reveal">
         <div class="visual-frame"></div>
         <div class="visual-img-box">
-          <img src="/image/interior-design-meeting-3people.jpg.png"
+          <img src="/image/interior-design-meeting-3people.jpg.png" loading="lazy"
             onerror="this.src='https://placehold.co/500x700/333/fff?text=Expert+Team'" alt="Team Image" />
         </div>
       </div>
