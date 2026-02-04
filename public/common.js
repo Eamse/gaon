@@ -143,7 +143,7 @@ window.logout = () => {
   if (confirm('로그아웃 하시겠습니까?')) {
     localStorage.removeItem('token');
     alert('로그아웃되었습니다.');
-    window.location.href = '/admin/admin-login';
+    window.location.href = '/admin-login';
   }
 };
 

@@ -29,7 +29,7 @@ const btnDeleteSelected = document.getElementById('btnDeleteSelected');
 document.addEventListener('DOMContentLoaded', () => {
     if (!projectId) {
         alert('잘못된 접근입니다. 프로젝트 ID가 없습니다.');
-        window.location.href = '/admin/admin-gallery';
+        window.location.href = '/admin-gallery';
         return;
     }
 
@@ -49,8 +49,6 @@ async function loadProjectData() {
         const res = await window.apiFetch(`/projects/${projectId}`);
         projectData = res.data;
 
-        // 2. 상세 이미지 리스트 가져오기 (API 확인 필요)
-        // uploadRouter.js를 보면 GET /projects/:projectId/images 가 있음.
         const imgRes = await window.apiFetch(`/projects/${projectId}/images`);
         // items가 배열임
         detailImages = (imgRes.items || []).map(img => ({

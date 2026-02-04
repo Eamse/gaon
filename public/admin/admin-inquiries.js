@@ -241,7 +241,7 @@ window.saveInquiryData = async () => {
       (err.message && err.message.includes('expired'))
     ) {
       alert('세션이 만료되었습니다. 다시 로그인해주세요.');
-      window.location.replace('/admin/admin-login');
+      window.location.replace('/admin-login');
       return;
     }
     alert('저장 실패: ' + err.message);
@@ -266,7 +266,7 @@ window.deleteInquiry = async (id) => {
       (err.message && err.message.includes('expired'))
     ) {
       alert('세션이 만료되었습니다. 다시 로그인해주세요.');
-      window.location.replace('/admin/admin-login');
+      window.location.replace('/admin-login');
       return;
     }
     alert('삭제 실패: ' + err.message);

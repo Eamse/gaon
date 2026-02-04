@@ -471,7 +471,7 @@ function handleUpdateError(error) {
 // ============================================
 
 window.editPhotoProject = function (id) {
-  window.location.href = `/admin/admin-gallery-photos.html?id=${id}`;
+  window.location.href = `/admin-gallery-photos.html?id=${id}`;
 };
 
 

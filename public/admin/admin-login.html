@@ -86,7 +86,7 @@
         if (res.token) {
           localStorage.setItem('token', res.token);
           alert('로그인 성공!');
-          window.location.href = '/admin/dashboard';
+          window.location.href = '/dashboard';
         } else {
           alert('로그인 실패: 토큰을 받지 못했습니다.');
         }

@@ -29,15 +29,6 @@ const router = Router();
 
 /**
  * GET /api/projects
- * 프로젝트 목록 조회
- * 
- * @query {number} [page=1] - 페이지 번호
- * @query {number} [limit=10] - 페이지당 항목 수
- * @query {string} [category] - 카테고리 필터
- * @query {string} [search] - 검색어 (제목, 위치에서 검색)
- * @query {string} [sort=createdAt] - 정렬 기준
- * @query {string} [order=desc] - 정렬 순서
- * @returns {Object} 프로젝트 목록
  */
 router.get('/', paginationValidation, validate, async (req, res, next) => {
   try {
@@ -117,19 +108,6 @@ router.get('/:id', projectIdValidation, validate, async (req, res, next) => {
 
 /**
  * POST /api/projects
- * 프로젝트 생성
- * 
- * @body {string} title - 프로젝트 제목 (필수)
- * @body {string} [description] - 설명
- * @body {string} [location] - 위치
- * @body {string} [category] - 카테고리
- * @body {number} [year] - 연도
- * @body {string} [period] - 기간
- * @body {number} [area] - 면적
- * @body {Array} [costs] - 견적 내역
- * @body {string} [mainImage] - 대표 이미지 URL
- * @body {Array} [images] - 이미지 목록
- * @returns {Object} 생성된 프로젝트
  */
 router.post('/', protect, createProjectValidation, validate, async (req, res, next) => {
   try {
@@ -188,20 +166,6 @@ router.post('/', protect, createProjectValidation, validate, async (req, res, ne
 
 /**
  * PATCH /api/projects/:id
- * 프로젝트 수정
- * 
- * @param {number} id - 프로젝트 ID
- * @body {string} [title] - 프로젝트 제목
- * @body {string} [description] - 설명
- * @body {string} [location] - 위치
- * @body {string} [category] - 카테고리
- * @body {number} [year] - 연도
- * @body {string} [period] - 기간
- * @body {number} [area] - 면적
- * @body {Array} [costs] - 견적 내역
- * @body {string} [mainImage] - 대표 이미지 URL
- * @body {Array} [images] - 이미지 목록
- * @returns {Object} 수정된 프로젝트
  */
 router.patch('/:id', protect, updateProjectValidation, validate, async (req, res, next) => {
   try {

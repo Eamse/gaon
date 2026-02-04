@@ -180,7 +180,7 @@ async function handleFormSubmit(e) {
 
     alert('프로젝트가 성공적으로 등록되었습니다!');
     // Redirect to gallery (Project Management)
-    window.location.href = '/admin/admin-gallery';
+    window.location.href = '/admin-gallery';
 
   } catch (error) {
     console.error('❌ Error:', error);

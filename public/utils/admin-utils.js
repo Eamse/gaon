@@ -35,7 +35,7 @@ export function removeToken() {
 export function checkAuth(redirect = true) {
     const token = getToken();
     if (!token && redirect) {
-        window.location.href = '/admin/admin-login.html';
+        window.location.href = '/admin-login.html';
         return false;
     }
     return !!token;
@@ -47,7 +47,7 @@ export function checkAuth(redirect = true) {
  */
 export function logout() {
     removeToken();
-    window.location.href = '/admin/admin-login.html';
+    window.location.href = '/admin-login.html';
 }
 
 /**
