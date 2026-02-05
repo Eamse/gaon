@@ -275,8 +275,9 @@ async function fetchDashboardStats() {
     }
 
     try {
-        const data = await window.apiFetch('/metrics/overview');
-        return data;
+        const response = await window.apiFetch('/metrics/overview');
+        // 백엔드가 { ok: true, ...stats } 형태로 직접 반환 (data 래핑 없음)
+        return response;
     } catch (error) {
         console.error('API 호출 실패:', error);
         return getMockStats();
