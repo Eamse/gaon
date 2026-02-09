@@ -96,10 +96,10 @@ function renderTable(list) {
       case 'new':
         badgeHtml = '<span class="badge badge-new">신규</span>';
         break;
-      case 'ing':
+      case 'processing':
         badgeHtml = '<span class="badge badge-ing">상담중</span>';
         break;
-      case 'done':
+      case 'completed':
         badgeHtml = '<span class="badge badge-done">완료</span>';
         break;
       default:

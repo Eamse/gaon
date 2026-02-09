@@ -28,13 +28,6 @@ const router = Router();
 /**
  * GET /api/inquiries
  * 문의 목록 조회 (관리자 전용)
- * 
- * @query {number} [page=1] - 페이지 번호
- * @query {number} [limit=10] - 페이지당 항목 수
- * @query {string} [status] - 상태 필터 (new, processing, completed, cancelled)
- * @query {string} [sort=createdAt] - 정렬 기준
- * @query {string} [order=desc] - 정렬 순서
- * @returns {Object} 문의 목록
  */
 router.get('/', protect, paginationValidation, validate, async (req, res, next) => {
   try {
@@ -73,17 +66,6 @@ router.get('/', protect, paginationValidation, validate, async (req, res, next) 
 /**
  * POST /api/inquiries
  * 문의 생성 (인증 불필요 - 사용자용)
- * 
- * @body {string} userName - 이름 (필수)
- * @body {string} userPhone - 연락처 (필수)
- * @body {string} [spaceType] - 공간 타입
- * @body {number} [areaSize] - 면적
- * @body {string} [location] - 위치
- * @body {string} [scope] - 범위
- * @body {number} [budget] - 예산
- * @body {string} [schedule] - 일정
- * @body {string} [requests] - 요청 사항
- * @returns {Object} 생성된 문의
  */
 router.post('/', createInquiryValidation, validate, async (req, res, next) => {
   try {
@@ -126,11 +108,6 @@ router.post('/', createInquiryValidation, validate, async (req, res, next) => {
 /**
  * PATCH /api/inquiries/:id
  * 문의 수정 (관리자 전용 - 상태 및 메모 업데이트)
- * 
- * @param {number} id - 문의 ID
- * @body {string} [status] - 상태 (new, processing, completed, cancelled)
- * @body {string} [adminMemo] - 관리자 메모
- * @returns {Object} 수정된 문의
  */
 router.patch('/:id', protect, updateInquiryValidation, validate, async (req, res, next) => {
   try {
@@ -162,9 +139,6 @@ router.patch('/:id', protect, updateInquiryValidation, validate, async (req, res
 /**
  * DELETE /api/inquiries/:id
  * 문의 삭제 (관리자 전용)
- * 
- * @param {number} id - 문의 ID
- * @returns {Object} 삭제 성공 메시지
  */
 router.delete('/:id', protect, async (req, res, next) => {
   try {

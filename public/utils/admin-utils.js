@@ -116,8 +116,6 @@ export function renderCategoryBadge(category) {
 
 /**
  * 상태 배지 생성
- * @param {string} status - 상태
- * @returns {string} HTML 문자열
  */
 export function renderStatusBadge(status) {
     const statusMap = {
@@ -184,9 +182,6 @@ export function showSuccess(message, container) {
 /**
  * API 에러 핸들러
  * 401 에러 시 자동으로 로그인 페이지로 리다이렉트
- * @param {Error} error - 에러 객체
- * @param {HTMLElement} [container] - 에러 메시지를 표시할 컨테이너
- * @returns {string} 에러 메시지
  */
 export function handleApiError(error, container) {
     let message = '오류가 발생했습니다.';

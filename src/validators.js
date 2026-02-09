@@ -1,17 +1,12 @@
 /**
  * 입력값 검증 규칙 모듈
- * express-validator를 사용하여 각 도메인별 검증 규칙을 정의합니다.
- * @module validators
+ * express-validator를 사용하여 각 도메인별 검증 규칙을 정의
  */
 
 import { body, param, query, validationResult } from 'express-validator';
 
 /**
  * 검증 결과를 확인하고 에러가 있으면 400 응답을 반환하는 미들웨어
- * @param {Object} req - Express Request 객체
- * @param {Object} res - Express Response 객체
- * @param {Function} next - Express next 함수
- * @returns {void}
  */
 export const validate = (req, res, next) => {
     const errors = validationResult(req);
