@@ -97,13 +97,13 @@ function renderTable(list) {
         badgeHtml = '<span class="badge badge-new">신규</span>';
         break;
       case 'processing':
-        badgeHtml = '<span class="badge badge-ing">상담중</span>';
+        badgeHtml = '<span class="badge badge-processing">상담중</span>';
         break;
       case 'completed':
-        badgeHtml = '<span class="badge badge-done">완료</span>';
+        badgeHtml = '<span class="badge badge-completed">완료</span>';
         break;
       default:
-        badgeHtml = '<span class="badge badge-cancel">취소/보류</span>';
+        badgeHtml = '<span class="badge badge-cancelled">취소/보류</span>';
     }
 
     const tr = document.createElement('tr');
@@ -151,8 +151,8 @@ window.filterInquiries = (status) => {
       {
         all: '전체',
         new: '신규',
-        ing: '상담중',
-        done: '완료',
+        processing: '상담중',
+        completed: '완료',
       }[status]
     ) {
       btn.classList.add('active');
