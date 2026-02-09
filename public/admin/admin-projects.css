@@ -566,30 +566,31 @@ textarea:focus {
   font-weight: 600;
 }
 
+/* 신규 - 파랑 */
 .badge-new {
   background: #eff6ff;
   color: #2563eb;
 }
 
-/* 신규 - 파랑 */
-.badge-ing {
+/* 진행중 - 주황 */
+.badge-processing {
   background: #fffbeb;
   color: #d97706;
 }
 
-/* 진행중 - 주황 */
-.badge-done {
+/* 완료 - 초록 */
+.badge-completed {
   background: #f0fdf4;
   color: #16a34a;
 }
 
-/* 완료 - 초록 */
-.badge-cancel {
+/* 취소 - 회색 */
+.badge-cancelled {
   background: #f3f4f6;
   color: #6b7280;
 }
 
-/* 취소 - 회색 */
+
 
 /* 모달 스타일 */
 .modal-overlay {
