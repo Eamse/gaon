@@ -1,25 +1,18 @@
-// src/admin-inquiries.js
-
-// 1. 로그인 체크
 if (!localStorage.getItem('token')) {
   alert('로그인이 만료되었거나 필요합니다.\n로그인 페이지로 이동합니다.');
   window.location.replace('/admin-login');
 }
 
-// 2. 더미 데이터 (Mock Data) - 나중에 API로 대체될 부분
-// consulting.html 폼의 필드와 매칭됩니다.
 let allInquiries = [];
 const selectedIds = new Set();
 
-// 현재 필터 상태 저장 (기본값: 'all')
 let currentFilterStatus = 'all';
 
-// 3. 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', () => {
   fetchInquiries();
 });
 
-// 4. 데이터 로드 함수
+/** 서버에서 모든 문의 목록을 가져와 렌더링합니다. */
 async function fetchInquiries() {
   try {
     const response = await window.apiFetch('/inquiries');
@@ -31,7 +24,6 @@ async function fetchInquiries() {
   } catch (err) {
     console.error('문의 목록 로드 실패:', err);
 
-    // 토큰 만료 시 로그인 페이지로 이동
     if (
       err.status === 401 ||
       (err.message && err.message.includes('expired'))
@@ -46,7 +38,7 @@ async function fetchInquiries() {
   }
 }
 
-// 5. 통계 갱신
+/** 문의 상태별 통계를 계산하고 화면에 업데이트합니다. */
 function updateStats() {
   const newCount = allInquiries.filter((i) => i.status === 'new').length;
   const ingCount = allInquiries.filter((i) => i.status === 'ing').length;
@@ -56,7 +48,7 @@ function updateStats() {
   document.getElementById('countTotal').textContent = allInquiries.length;
 }
 
-// XSS 방지를 위한 HTML 이스케이프 함수
+/** XSS 공격을 방지하기 위해 HTML 문자열을 이스케이프 처리합니다. */
 function escapeHtml(text) {
   if (text == null) return '';
   return String(text)
@@ -67,7 +59,7 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
-// 6. 테이블 렌더링
+/** 주어진 문의 목록을 사용하여 테이블을 렌더링합니다. */
 function renderTable(list) {
   const tbody = document.getElementById('inquiryTableBody');
   tbody.innerHTML = '';
@@ -78,7 +70,6 @@ function renderTable(list) {
     return;
   }
 
-  // 매핑용 객체 (영어 -> 한글)
   const typeMap = {
     apartment: '아파트',
     villa: '빌라/주택',
@@ -86,11 +77,9 @@ function renderTable(list) {
     etc: '기타',
   };
 
-  // 최신순 정렬 (ID 내림차순)
   const sortedList = [...list].sort((a, b) => b.id - a.id);
 
   sortedList.forEach((item) => {
-    // 상태 뱃지 HTML 생성
     let badgeHtml = '';
     switch (item.status) {
       case 'new':
@@ -121,15 +110,18 @@ function renderTable(list) {
       <td>${item.createdAt}</td>
       <td style="font-weight:600;">${escapeHtml(item.userName)}</td>
       <td>${escapeHtml(item.userPhone)}</td>
-      <td>${typeMap[item.spaceType] || escapeHtml(item.spaceType)} / ${item.areaSize
+      <td>${typeMap[item.spaceType] || escapeHtml(item.spaceType)} / ${
+        item.areaSize
       }평</td>
       <td>${Number(item.budget).toLocaleString()}만원</td>
       <td>
         <div class="action-buttons">
-          <button class="btn-action btn-view" onclick="openDetail(${item.id
-      })">상세보기</button>
-          <button class="btn-action btn-del" onclick="deleteInquiry(${item.id
-      })">삭제</button>
+          <button class="btn-action btn-view" onclick="openDetail(${
+            item.id
+          })">상세보기</button>
+          <button class="btn-action btn-del" onclick="deleteInquiry(${
+            item.id
+          })">삭제</button>
         </div>
       </td>
     `;
@@ -139,11 +131,10 @@ function renderTable(list) {
   updateSelectAllCheckbox(sortedList);
 }
 
-// 7. 필터링 로직
+/** 상태 값에 따라 문의 목록을 필터링하고 다시 렌더링합니다. */
 window.filterInquiries = (status) => {
-  currentFilterStatus = status; // 현재 필터 상태 업데이트
+  currentFilterStatus = status;
 
-  // 버튼 스타일 활성화
   const btns = document.querySelectorAll('.filter-btn');
   btns.forEach((btn) => {
     if (
@@ -161,7 +152,6 @@ window.filterInquiries = (status) => {
     }
   });
 
-  // 데이터 필터링
   if (status === 'all') {
     renderTable(allInquiries);
   } else {
@@ -170,16 +160,15 @@ window.filterInquiries = (status) => {
   }
 };
 
-// 8. 모달 제어 로직
 let currentId = null;
 
+/** 특정 문의의 상세 정보를 모달에 표시합니다. */
 window.openDetail = (id) => {
   const item = allInquiries.find((d) => d.id === id);
   if (!item) return;
 
   currentId = id;
 
-  // 매핑 객체
   const typeMap = {
     apartment: '아파트',
     villa: '빌라/주택',
@@ -192,33 +181,29 @@ window.openDetail = (id) => {
     window: '창호 교체',
   };
 
-  // 모달 데이터 채우기
   document.getElementById('m_userName').textContent = item.userName;
   document.getElementById('m_userPhone').textContent = item.userPhone;
   document.getElementById('m_spaceInfo').textContent = typeMap[item.spaceType];
-  document.getElementById(
-    'm_location'
-  ).textContent = `${item.location} (${item.areaSize}평)`;
+  document.getElementById('m_location').textContent =
+    `${item.location} (${item.areaSize}평)`;
   document.getElementById('m_scope').textContent = scopeMap[item.scope];
-  document.getElementById(
-    'm_budget'
-  ).textContent = `${item.budget.toLocaleString()}만원`;
+  document.getElementById('m_budget').textContent =
+    `${item.budget.toLocaleString()}만원`;
   document.getElementById('m_schedule').textContent = item.schedule;
   document.getElementById('m_requests').textContent = item.requests;
 
-  // 관리자 입력 필드 세팅
   document.getElementById('m_statusSelect').value = item.status;
   document.getElementById('m_adminMemo').value = item.adminMemo || '';
 
-  // 모달 표시
   document.getElementById('detailModal').classList.add('active');
 };
 
+/** 상세 정보 모달을 닫습니다. */
 window.closeModal = () => {
   document.getElementById('detailModal').classList.remove('active');
 };
 
-// 9. 관리자 메모/상태 저장
+/** 모달에서 수정한 문의 상태와 메모를 서버에 저장합니다. */
 window.saveInquiryData = async () => {
   if (!currentId) return;
 
@@ -232,10 +217,9 @@ window.saveInquiryData = async () => {
     });
     alert('저장되었습니다.');
     closeModal();
-    await fetchInquiries(); // DB에서 최신 데이터 다시 로드
-    window.filterInquiries(currentFilterStatus); // 필터 상태 유지
+    await fetchInquiries();
+    window.filterInquiries(currentFilterStatus);
   } catch (err) {
-    // 토큰 만료 시 로그인 페이지로 이동
     if (
       err.status === 401 ||
       (err.message && err.message.includes('expired'))
@@ -248,10 +232,10 @@ window.saveInquiryData = async () => {
   }
 };
 
-// 10. 문의 삭제
+/** ID를 기준으로 특정 문의를 삭제합니다. */
 window.deleteInquiry = async (id) => {
   const confirmed = confirm(
-    '정말 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.'
+    '정말 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.',
   );
   if (!confirmed) return;
 
@@ -273,12 +257,13 @@ window.deleteInquiry = async (id) => {
   }
 };
 
-// 11. 체크박스 제어
+/** 테이블 행의 개별 체크박스 선택 상태를 토글합니다. */
 window.toggleRowSelect = (id, checked) => {
   if (checked) selectedIds.add(id);
   else selectedIds.delete(id);
 };
 
+/** 테이블의 모든 행을 선택하거나 선택 해제합니다. */
 window.toggleSelectAll = (checked) => {
   const tbody = document.getElementById('inquiryTableBody');
   if (!tbody) return;
@@ -295,6 +280,7 @@ window.toggleSelectAll = (checked) => {
   });
 };
 
+/** 렌더링된 목록을 기준으로 '전체 선택' 체크박스의 상태를 업데이트합니다. */
 function updateSelectAllCheckbox(renderedList) {
   const selectAll = document.getElementById('selectAll');
   if (!selectAll) return;
@@ -306,7 +292,7 @@ function updateSelectAllCheckbox(renderedList) {
   selectAll.checked = allSelected;
 }
 
-// 12. 선택 삭제
+/** 선택된 모든 문의를 일괄적으로 삭제합니다. */
 window.deleteSelected = async () => {
   if (selectedIds.size === 0) {
     alert('삭제할 항목을 선택해주세요.');
@@ -314,7 +300,7 @@ window.deleteSelected = async () => {
   }
   if (
     !confirm(
-      `선택한 ${selectedIds.size}건을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.`
+      `선택한 ${selectedIds.size}건을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.`,
     )
   )
     return;

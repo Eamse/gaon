@@ -1,8 +1,3 @@
-/**
- * 문의 관리 라우터
- * @module inquiryRouter
- */
-
 import { Router } from 'express';
 import prisma from './db.js';
 import { protect } from './auth.js';
@@ -25,48 +20,50 @@ import logger from './utils/logger.js';
 
 const router = Router();
 
-/**
- * GET /api/inquiries
- * 문의 목록 조회 (관리자 전용)
- */
-router.get('/', protect, paginationValidation, validate, async (req, res, next) => {
-  try {
-    const { page = 1, limit = 10, status, sort, order } = req.query;
+/** GET /api/inquiries - 모든 문의 목록을 페이지네이션하여 조회합니다 (관리자 전용). */
+router.get(
+  '/',
+  protect,
+  paginationValidation,
+  validate,
+  async (req, res, next) => {
+    try {
+      const { page = 1, limit = 10, status, sort, order } = req.query;
 
-    // 페이지네이션
-    const { skip, take } = getPagination(page, limit);
+      const { skip, take } = getPagination(page, limit);
 
-    // 정렬
-    const orderBy = getSortParams(sort, order, ['createdAt', 'updatedAt'], 'createdAt');
+      const orderBy = getSortParams(
+        sort,
+        order,
+        ['createdAt', 'updatedAt'],
+        'createdAt',
+      );
 
-    // 필터
-    const where = buildFilters({ status }, []);
+      const where = buildFilters({ status }, []);
 
-    // 전체 개수 조회
-    const total = await prisma.inquiry.count({ where });
+      const total = await prisma.inquiry.count({ where });
 
-    // 문의 목록 조회
-    const inquiries = await prisma.inquiry.findMany({
-      where,
-      skip,
-      take,
-      orderBy,
-    });
+      const inquiries = await prisma.inquiry.findMany({
+        where,
+        skip,
+        take,
+        orderBy,
+      });
 
-    logger.info(`문의 목록 조회: page=${page}, limit=${limit}, total=${total}`);
+      logger.info(
+        `문의 목록 조회: page=${page}, limit=${limit}, total=${total}`,
+      );
 
-    res.json(paginatedResponse(inquiries, total, page, limit));
-  } catch (error) {
-    logger.error(`문의 목록 조회 에러: ${error.message}`);
-    const { status, message } = handlePrismaError(error);
-    next(Object.assign(new Error(message), { status }));
-  }
-});
+      res.json(paginatedResponse(inquiries, total, page, limit));
+    } catch (error) {
+      logger.error(`문의 목록 조회 에러: ${error.message}`);
+      const { status, message } = handlePrismaError(error);
+      next(Object.assign(new Error(message), { status }));
+    }
+  },
+);
 
-/**
- * POST /api/inquiries
- * 문의 생성 (인증 불필요 - 사용자용)
- */
+/** POST /api/inquiries - 새로운 문의를 생성합니다. */
 router.post('/', createInquiryValidation, validate, async (req, res, next) => {
   try {
     const {
@@ -105,41 +102,41 @@ router.post('/', createInquiryValidation, validate, async (req, res, next) => {
   }
 });
 
-/**
- * PATCH /api/inquiries/:id
- * 문의 수정 (관리자 전용 - 상태 및 메모 업데이트)
- */
-router.patch('/:id', protect, updateInquiryValidation, validate, async (req, res, next) => {
-  try {
-    const id = parseInt(req.params.id, 10);
-    const { status, adminMemo } = req.body;
+/** PATCH /api/inquiries/:id - 특정 문의의 상태 또는 관리자 메모를 수정합니다 (관리자 전용). */
+router.patch(
+  '/:id',
+  protect,
+  updateInquiryValidation,
+  validate,
+  async (req, res, next) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const { status, adminMemo } = req.body;
 
-    const dataToUpdate = {};
-    if (status !== undefined) dataToUpdate.status = status;
-    if (adminMemo !== undefined) dataToUpdate.adminMemo = adminMemo;
+      const dataToUpdate = {};
+      if (status !== undefined) dataToUpdate.status = status;
+      if (adminMemo !== undefined) dataToUpdate.adminMemo = adminMemo;
 
-    if (Object.keys(dataToUpdate).length === 0) {
-      return res.status(400).json(errorResponse('수정할 내용이 없습니다.'));
+      if (Object.keys(dataToUpdate).length === 0) {
+        return res.status(400).json(errorResponse('수정할 내용이 없습니다.'));
+      }
+
+      const updatedInquiry = await prisma.inquiry.update({
+        where: { id },
+        data: dataToUpdate,
+      });
+
+      logger.info(`문의 수정: ID=${id}, status=${status}`);
+      res.json(successResponse(updatedInquiry, '문의가 수정되었습니다.'));
+    } catch (error) {
+      logger.error(`문의 수정 에러: ${error.message}`);
+      const { status, message } = handlePrismaError(error);
+      next(Object.assign(new Error(message), { status }));
     }
+  },
+);
 
-    const updatedInquiry = await prisma.inquiry.update({
-      where: { id },
-      data: dataToUpdate,
-    });
-
-    logger.info(`문의 수정: ID=${id}, status=${status}`);
-    res.json(successResponse(updatedInquiry, '문의가 수정되었습니다.'));
-  } catch (error) {
-    logger.error(`문의 수정 에러: ${error.message}`);
-    const { status, message } = handlePrismaError(error);
-    next(Object.assign(new Error(message), { status }));
-  }
-});
-
-/**
- * DELETE /api/inquiries/:id
- * 문의 삭제 (관리자 전용)
- */
+/** DELETE /api/inquiries/:id - 특정 문의를 삭제합니다 (관리자 전용). */
 router.delete('/:id', protect, async (req, res, next) => {
   try {
     const id = parseInt(req.params.id, 10);

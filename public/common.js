@@ -1,34 +1,28 @@
-// src/common.js
-
-// 1. API Base URL 설정
+/** 현재 환경(로컬/배포)에 맞는 API 기본 URL을 결정합니다. */
 const resolveApiBase = () => {
   const meta = document.querySelector('meta[name="gaon-api-base"]');
   const { hostname, port, protocol, origin } = window.location;
 
-  // 로컬/개발 환경
   const isLocalHost =
     protocol === 'file:' ||
     port === '5500' ||
     port === '5502' ||
     ['localhost', '127.0.0.1', '[::1]'].includes(hostname);
 
-  // 1) 메타 태그가 있으면 최우선 사용
   if (meta?.content) {
     return meta.content.replace(/\/$/, '');
   }
 
-  // 2) 로컬이면 기본 로컬 API 주소
   if (isLocalHost) {
     return 'http://localhost:4001/api';
   }
 
-  // 3) 배포 환경이면 동일 도메인의 /api 사용
   return `${origin}/api`.replace(/\/$/, '');
 };
 
 window.GAON_API_BASE = resolveApiBase();
 
-// 2. 공통 API 호출 함수 (window.apiFetch)
+/** 인증 토큰을 포함하여 API 서버에 간편하게 요청을 보내는 공통 함수입니다. */
 window.apiFetch = async (url, options = {}) => {
   const headers = {
     ...(options.headers || {}),
@@ -46,10 +40,8 @@ window.apiFetch = async (url, options = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  // FormData가 아닐 때만 Content-Type: application/json 자동 추가
   if (!(options.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
-    // body가 객체라면 JSON 문자열로 변환
     if (options.body && typeof options.body === 'object') {
       options.body = JSON.stringify(options.body);
     }
@@ -60,7 +52,6 @@ window.apiFetch = async (url, options = {}) => {
     headers,
   };
 
-  // URL이 '/'로 시작하면 API Base URL을 앞에 붙여줌
   let requestUrl = url;
   if (url.startsWith('/') && window.GAON_API_BASE) {
     requestUrl = `${window.GAON_API_BASE}${url}`;
@@ -69,18 +60,15 @@ window.apiFetch = async (url, options = {}) => {
   try {
     const response = await fetch(requestUrl, finalOptions);
 
-    // 응답이 JSON이 아닐 수도 있으므로 text로 먼저 읽음
     const text = await response.text();
     let data;
     try {
       data = text ? JSON.parse(text) : {};
     } catch (e) {
-      // JSON 파싱 실패 시, 텍스트를 오류 메시지로 사용
       data = { ok: response.ok, error: text || response.statusText };
     }
 
     if (!response.ok) {
-      // 상태 코드와 서버 메시지를 포함시켜 호출부에서 분기 가능하도록 처리
       const error = new Error(data.error || `HTTP error ${response.status}`);
       error.status = response.status;
       error.body = data;
@@ -89,11 +77,11 @@ window.apiFetch = async (url, options = {}) => {
     return data;
   } catch (error) {
     console.error('API Error:', error);
-    throw error; // 오류를 다시 던져서 호출한 쪽에서 catch 할 수 있도록 함
+    throw error;
   }
 };
 
-// 3. 알림 표시 함수 (window.showNotice)
+/** 화면 우측 상단에 알림 메시지(토스트)를 표시합니다. */
 window.showNotice = (message, type = 'info') => {
   let container = document.getElementById('noticeContainer');
   if (!container) {
@@ -105,7 +93,6 @@ window.showNotice = (message, type = 'info') => {
     `;
     document.body.appendChild(container);
 
-    // 스타일 주입
     const style = document.createElement('style');
     style.textContent = `
       .notice-toast {
@@ -131,14 +118,13 @@ window.showNotice = (message, type = 'info') => {
 
   container.appendChild(notice);
 
-  // 3초 후 사라짐
   setTimeout(() => {
     notice.classList.add('fade-out');
     notice.addEventListener('transitionend', () => notice.remove());
   }, 3000);
 };
 
-// 4. 로그아웃 함수
+/** 사용자 로그아웃을 처리하고 로그인 페이지로 이동합니다. */
 window.logout = () => {
   if (confirm('로그아웃 하시겠습니까?')) {
     localStorage.removeItem('token');
@@ -147,7 +133,7 @@ window.logout = () => {
   }
 };
 
-// 5. 전역 로딩 표시 함수
+/** 화면 전체를 덮는 로딩 스피너를 표시하거나 숨깁니다. */
 window.showLoader = (show = true) => {
   let loader = document.getElementById('globalLoader');
   if (!loader) {

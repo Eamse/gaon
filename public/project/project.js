@@ -1,4 +1,4 @@
-// project.js
+/** API 기본 주소를 결정합니다. */
 const resolveApiBase = () => {
   const meta = document.querySelector('meta[name="gaon-api-base"]');
   if (meta?.content) {
@@ -11,6 +11,7 @@ const resolveApiBase = () => {
 };
 const API_BASE = resolveApiBase();
 
+/** 프로젝트 목록 페이지의 전체 기능을 즉시 실행 함수로 관리합니다. */
 (() => {
   const gridEl = document.querySelector('[data-project-grid]');
   const emptyEl = document.querySelector('[data-project-empty]');
@@ -22,24 +23,21 @@ const API_BASE = resolveApiBase();
   const sortList = document.querySelector('[data-sort-list]');
   const sortLabel = document.querySelector('[data-sort-label]');
 
-  // 검색 (디바운싱 적용)
   if (searchBtn && searchInput) {
     let searchTimeout;
+    /** 검색어를 적용하고 API를 호출합니다. */
     const applySearch = () => {
       state.q = (searchInput.value || '').trim();
       fetchProjectsFromApi();
     };
 
-    // 타이핑 중 디바운싱
     searchInput.addEventListener('input', () => {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(applySearch, 300);
     });
 
-    // 버튼 클릭 시 즉시 검색
     searchBtn.addEventListener('click', applySearch);
 
-    // Enter 키도 즉시 검색
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -49,7 +47,6 @@ const API_BASE = resolveApiBase();
     });
   }
 
-  // 정렬 선택
   if (sortList && sortLabel) {
     sortList.querySelectorAll('button[data-sort-value]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -62,7 +59,6 @@ const API_BASE = resolveApiBase();
     });
   }
 
-  // 정렬 드롭다운 열기/닫기
   if (sortBox && sortList) {
     const toggleBtn = sortBox.querySelector('.sort-btn');
     const closeAll = () => sortBox.classList.remove('open');
@@ -79,7 +75,7 @@ const API_BASE = resolveApiBase();
   }
 
   if (!gridEl) return;
-  // 1) 상태 값
+
   const state = {
     category: '', // '' = 전체보기
     sort: 'recent',
@@ -87,24 +83,25 @@ const API_BASE = resolveApiBase();
     items: [],
   };
 
+  /** 총 개수를 업데이트합니다. */
   const updateTotal = (value) => {
     if (!totalEl) return;
     totalEl.textContent = value.toLocaleString();
   };
 
+  /** "결과 없음" 메시지를 토글합니다. */
   const toggleEmpty = (isEmpty) => {
     if (!emptyEl) return;
     emptyEl.hidden = !isEmpty;
   };
 
-  // 2) 카드 하나 생성
+  /** 프로젝트 데이터로 카드 DOM 요소를 생성합니다. */
   const createCard = (project) => {
     const li = document.createElement('li');
     li.className = 'project-item';
 
     const link = document.createElement('a');
 
-    // ✅ 이제 name이 아니라 id로 라우팅
     link.href = `./project-detail?id=${project.id}`;
 
     const imgWrap = document.createElement('div');
@@ -113,8 +110,7 @@ const API_BASE = resolveApiBase();
     const img = document.createElement('img');
     img.src = project.mainImage || 'https://placehold.co/270x170?text=No+Image';
     img.alt = project.title || project.name;
-    img.loading = 'lazy'; // 레이지 로딩 추가
-
+    img.loading = 'lazy';
 
     imgWrap.appendChild(img);
     link.appendChild(imgWrap);
@@ -130,10 +126,9 @@ const API_BASE = resolveApiBase();
     return li;
   };
 
-  // 3) 상태(state)에 맞는 리스트 필터링
+  /** 현재 상태에 따라 보여줄 아이템 목록을 필터링하고 정렬합니다. */
   const getVisibleItems = () => {
     let items = [...state.items];
-    //검색 필터링 로직
     if (state.q) {
       const keyword = state.q.toLowerCase();
       items = items.filter((p) => {
@@ -141,28 +136,26 @@ const API_BASE = resolveApiBase();
       });
     }
 
-    // 카테고리 필터
     if (state.category) {
       items = items.filter((p) => p.rawCategory === state.category);
     }
 
-    // 정렬 (지금은 createdAt 없으니까 id 기준으로만)
     if (state.sort === 'recent') {
       items.sort(
         (a, b) =>
-          (b.createdAt ?? 0) - (a.createdAt ?? 0) || (b.id || 0) - (a.id || 0)
+          (b.createdAt ?? 0) - (a.createdAt ?? 0) || (b.id || 0) - (a.id || 0),
       );
     } else if (state.sort === 'oldest') {
       items.sort(
         (a, b) =>
-          (a.createdAt ?? 0) - (b.createdAt ?? 0) || (a.id || 0) - (b.id || 0)
+          (a.createdAt ?? 0) - (b.createdAt ?? 0) || (a.id || 0) - (b.id || 0),
       );
     }
 
     return items;
   };
 
-  // 4) 실제 렌더링
+  /** 필터링된 프로젝트 목록을 화면에 렌더링합니다. */
   const render = () => {
     const visible = getVisibleItems();
     gridEl.innerHTML = '';
@@ -181,21 +174,16 @@ const API_BASE = resolveApiBase();
     updateTotal(visible.length);
   };
 
+  /** API 서버에서 프로젝트 목록을 가져와 상태를 업데이트하고 렌더링합니다. */
   const fetchProjectsFromApi = async () => {
     try {
-      // 1) 쿼리스트링 만들기
-      // 현재 API 구조상 전체 목록을 불러온 뒤 클라이언트에서 필터링하거나,
-      // API가 지원한다면 파라미터를 보냅니다. 여기서는 전체를 불러옵니다.
       const res = await fetch(`${API_BASE}/projects`);
       if (!res.ok) throw new Error('목록 조회 실패');
 
       const data = await res.json();
-      // 백엔드가 { ok: true, data: [...] } 형태로 반환
       const projects = data.data || [];
 
-      // 3) 응답 -> state.items로 변환
       state.items = projects.map((p) => {
-        // 썸네일 찾기
         let thumb = 'https://placehold.co/270x170?text=No+Image';
         if (p.mainImage) {
           thumb = p.mainImage;
@@ -205,16 +193,15 @@ const API_BASE = resolveApiBase();
 
         return {
           id: p.id,
-          name: String(p.id), // name 대신 id 사용
+          name: String(p.id),
           title: p.title || '제목 없음',
-          rawCategory: p.category, // 필터링을 위한 원본 카테고리
-          category: p.category || '미분류', // 화면 표기용
+          rawCategory: p.category,
+          category: p.category || '미분류',
           createdAt: p.createdAt ? new Date(p.createdAt).getTime() : null,
           mainImage: thumb,
         };
       });
 
-      // 4) 화면 다시 그리기
       render();
       updateTotal(state.items.length);
     } catch (error) {
@@ -225,17 +212,15 @@ const API_BASE = resolveApiBase();
     }
   };
 
-  // 5) 왼쪽 카테고리 클릭 핸들러
+  /** 카테고리 필터 클릭 이벤트를 처리합니다. */
   const handleFilterClick = (event) => {
     const target = event.target.closest('.filter-item');
     if (!target) return;
 
     const category = target.dataset.category || '';
 
-    // 이미 선택된 카테고리면 무시
     if (category === state.category) return;
 
-    // active 클래스 토글
     filterList
       .querySelectorAll('.filter-item')
       .forEach((item) => item.classList.toggle('active', item === target));
@@ -248,6 +233,5 @@ const API_BASE = resolveApiBase();
     filterList.addEventListener('click', handleFilterClick);
   }
 
-  // 초기 렌더
   fetchProjectsFromApi();
 })();

@@ -5,12 +5,14 @@ import { protect } from './auth.js';
 const router = Router();
 router.use(protect);
 
+/** Date 객체를 해당 날짜의 시작(00:00:00)으로 설정합니다. */
 const startOfDay = (date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d;
 };
 
+/** 날짜 범위를 최대 90일로 제한합니다. */
 const clampRange = (from, to, maxDays = 90) => {
   const end = startOfDay(to);
   const start = startOfDay(from);
@@ -22,12 +24,14 @@ const clampRange = (from, to, maxDays = 90) => {
   return { from: start, to: end };
 };
 
+/** 문자열을 Date 객체로 파싱하고, 실패 시 fallback 값을 반환합니다. */
 const parseDate = (value, fallback) => {
   const ts = Date.parse(value);
   if (Number.isNaN(ts)) return startOfDay(fallback);
   return startOfDay(new Date(ts));
 };
 
+/** 지정된 기간 동안의 방문 로그를 집계하여 VisitStat 테이블에 저장(upsert)합니다. */
 const aggregateVisitStats = async (from, to) => {
   const endExclusive = new Date(to);
   endExclusive.setDate(endExclusive.getDate() + 1);
@@ -61,11 +65,12 @@ const aggregateVisitStats = async (from, to) => {
           pv: Number(row.pv),
           uv: Number(row.uv),
         },
-      })
-    )
+      }),
+    ),
   );
 };
 
+/** GET /api/metrics/daily - 일별 방문 통계를 조회합니다. */
 router.get('/daily', async (req, res, next) => {
   try {
     const today = startOfDay(new Date());
@@ -103,21 +108,18 @@ router.get('/daily', async (req, res, next) => {
   }
 });
 
-// 📌 대시보드 오버뷰 통계 (GET /api/metrics/overview)
+/** GET /api/metrics/overview - 대시보드에 필요한 주요 통계 데이터를 조회합니다. */
 router.get('/overview', async (req, res, next) => {
   try {
     const today = startOfDay(new Date());
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    // 1. 오늘 방문자 수 (VisitStat에서 조회)
-    // 오늘 날짜의 VisitStat 레코드를 모두 합산
     const visitorsTodayAgg = await prisma.visitStat.aggregate({
       where: { date: today },
       _sum: { uv: true },
     });
     const visitorsToday = visitorsTodayAgg._sum.uv || 0;
 
-    // 2. 이번 달 문의 수
     const inquiriesMonth = await prisma.inquiry.count({
       where: {
         createdAt: {
@@ -126,36 +128,30 @@ router.get('/overview', async (req, res, next) => {
       },
     });
 
-    // 3. 총 프로젝트 수
     const totalProjects = await prisma.project.count();
 
-    // 4. 대기 중인 문의 수 (status: 'new' or 'ing')
     const pendingInquiries = await prisma.inquiry.count({
       where: {
         status: { in: ['new', 'ing'] },
       },
     });
 
-    // 5. 최근 활동 (최근 문의 5개 + 최근 프로젝트 3개 + 최근 갤러리 3개)
-    // - 문의
     const recentInquiries = await prisma.inquiry.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
     });
-    // - 프로젝트
     const recentProjects = await prisma.project.findMany({
       take: 3,
       orderBy: { createdAt: 'desc' },
     });
 
-    // 활동 리스트 통합 및 정렬
     const activities = [
       ...recentInquiries.map((iq) => ({
         type: 'new', // icon: envelope
         icon: 'envelope',
         title: '새로운 견적 문의',
         meta: `${iq.userName} · ${iq.spaceType || '-'} · ${new Date(
-          iq.createdAt
+          iq.createdAt,
         ).toLocaleDateString()}`,
         date: iq.createdAt,
       })),
@@ -164,15 +160,14 @@ router.get('/overview', async (req, res, next) => {
         icon: 'hammer',
         title: '프로젝트 등록',
         meta: `${pj.title} · ${pj.location || '-'} · ${new Date(
-          pj.createdAt
+          pj.createdAt,
         ).toLocaleDateString()}`,
         date: pj.createdAt,
       })),
     ]
       .sort((a, b) => b.date - a.date)
-      .slice(0, 5); // 최신 5개만
+      .slice(0, 5);
 
-    // 6. 방문자 추이 (최근 7일)
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 6);
 
@@ -194,7 +189,7 @@ router.get('/overview', async (req, res, next) => {
         new Date(stat.date).toLocaleDateString('ko-KR', {
           month: 'numeric',
           day: 'numeric',
-        })
+        }),
       ),
       data: dailyStats.map((stat) => stat._sum.uv || 0),
     };

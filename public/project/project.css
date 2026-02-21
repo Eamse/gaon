@@ -1,18 +1,20 @@
-/* 기본 리셋 & 공통 */
 * {
   box-sizing: border-box;
-  font-family: 'SUIT', 'Pretendard', 'Noto Sans KR', system-ui, -apple-system,
+  font-family:
+    'SUIT',
+    'Pretendard',
+    'Noto Sans KR',
+    system-ui,
+    -apple-system,
     sans-serif;
   list-style: none;
 }
-
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
 }
 
-/* 메인 레이아웃 */
 .project-main {
   max-width: 1600px;
   margin: 70px 50px 0;
@@ -22,13 +24,11 @@ body {
   clear: both;
   position: relative;
 }
-
 .aside-form {
   display: flex;
   gap: 0 64px;
 }
 
-/* 사이드 필터 */
 .project-filter {
   display: block;
   margin: 0;
@@ -36,19 +36,16 @@ body {
   width: 190px;
   flex-shrink: 0;
 }
-
 .aside-content {
   max-width: 320px;
   height: auto;
   text-align: left;
 }
-
 .aside-content h2 {
   margin: 0 0 16px;
   font-size: 1.05rem;
   font-weight: 600;
 }
-
 .filter-list {
   padding: 0;
   margin: 0;
@@ -56,22 +53,20 @@ body {
   flex-direction: column;
   gap: 12px;
 }
-
 .filter-item {
   cursor: pointer;
   color: #777;
   font-size: 0.95rem;
   padding: 6px 0;
-  transition: color 0.2s ease, transform 0.15s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.15s ease;
 }
-
 .filter-item.active {
   font-weight: 600;
   color: #111;
   transform: translateX(2px);
 }
-
-/* 오른쪽 콘텐츠 영역 */
 .project-trigger {
   flex: 1;
 }
@@ -84,7 +79,6 @@ body {
   width: 100%;
 }
 
-/* 상단 필터 / 검색 / 정렬 바 */
 .content-filter {
   display: flex;
   align-items: center;
@@ -92,17 +86,14 @@ body {
   padding: 0;
   gap: 16px;
 }
-
 .total {
   font-size: 0.95rem;
   color: #555;
 }
-
 .total strong {
   font-weight: 600;
 }
 
-/* 오른쪽 검색 + 정렬 모음 */
 .content-filter-right {
   margin-left: auto;
   display: flex;
@@ -110,7 +101,6 @@ body {
   gap: 12px;
 }
 
-/* 검색 박스 */
 .search-box {
   display: flex;
   justify-content: space-between;
@@ -121,7 +111,6 @@ body {
   background: #f5f5f7;
   min-width: fit-content;
 }
-
 .search-box input[type='search'] {
   border: none;
   background: transparent;
@@ -130,7 +119,6 @@ body {
   outline: none;
   min-width: 140px;
 }
-
 .search-box button {
   border: none;
   border-radius: 999px;
@@ -142,16 +130,13 @@ body {
   font-weight: 500;
   transition: opacity 0.15s ease;
 }
-
 .search-box button:hover {
   opacity: 0.85;
 }
 
-/* 정렬 드롭다운 */
 .sorting {
   position: relative;
 }
-
 .sort-btn {
   appearance: none;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -164,13 +149,11 @@ body {
   align-items: center;
   gap: 6px;
 }
-
 .sort-btn::after {
   content: '▾';
   font-size: 0.7rem;
   opacity: 0.7;
 }
-
 .sort-list {
   position: absolute;
   top: calc(100% + 8px);
@@ -185,17 +168,14 @@ body {
   display: none;
   z-index: 10;
 }
-
 .sorting.open .sort-list {
   display: block;
   position: relative;
 }
-
 .sort-list li {
   margin: 0;
   padding: 0;
 }
-
 .sort-list button {
   width: 100%;
   border: none;
@@ -205,12 +185,10 @@ body {
   font-size: 0.9rem;
   cursor: pointer;
 }
-
 .sort-list button:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
-/* 그리드 */
 .grid-wrap {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -221,22 +199,18 @@ body {
   margin: 0;
   align-items: stretch;
 }
-
 [data-project-grid] {
   min-height: 120px;
 }
-
 [data-project-grid][data-loading='true'] {
   opacity: 0.6;
   pointer-events: none;
 }
 
-/* 개별 카드(높이 통일 포인트) */
 .project-item {
   display: flex;
   height: 100%;
 }
-
 .project-card-btn {
   border: none;
   background: #fff;
@@ -247,26 +221,26 @@ body {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: 100%; /* ✅ 카드 전체 높이 고정 */
+  height: 100%;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.06);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.2s ease;
 }
-
 .project-card-btn:hover {
   transform: translateY(-6px);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
   background: #f9fafc;
 }
 
-/* 이미지 래퍼: 고정 비율 + 통일된 높이 느낌 */
 .project-item .img {
   position: relative;
   overflow: hidden;
   margin-bottom: 10px;
-  aspect-ratio: 4 / 3; /* ✅ 모든 썸네일 비율 고정 */
+  aspect-ratio: 4 / 3;
   background: #f3f3f5;
 }
-
 .project-item .img img {
   width: 100%;
   height: 100%;
@@ -274,12 +248,10 @@ body {
   display: block;
   transition: transform 0.3s ease;
 }
-
 .project-card-btn:hover .img img {
   transform: scale(1.04);
 }
 
-/* 카드 오버레이 (Apple 느낌) */
 .project-overlay {
   position: absolute;
   inset: auto 0 0 0;
@@ -291,18 +263,15 @@ body {
   gap: 2px;
   pointer-events: none;
 }
-
 .project-overlay .overlay-title {
   font-size: 0.9rem;
   font-weight: 700;
 }
-
 .project-overlay .overlay-sub {
   font-size: 0.78rem;
   opacity: 0.9;
 }
 
-/* 카드 하단 텍스트 */
 .project-item .project-title {
   margin-top: 6px;
   font-size: 0.9rem;
@@ -310,21 +279,18 @@ body {
   font-weight: 500;
 }
 
-/* 빈 상태 */
 .project-empty {
   margin: 32px 0 0;
   color: #6b6b6b;
   font-size: 0.95rem;
 }
 
-/* 무한 스크롤 센티널 */
 .project-scroll-sentinel {
   width: 100%;
   height: 1px;
   margin-top: 32px;
 }
 
-/* 업로드 섹션 (필요 시 사용) */
 .project-upload {
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.05);
@@ -333,24 +299,20 @@ body {
   margin-bottom: 32px;
   box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04);
 }
-
 .project-upload h2 {
   margin: 0 0 0.4rem;
 }
-
 .project-upload p {
   margin: 0 0 1.2rem;
   color: #6b6b6b;
   font-size: 0.95rem;
 }
-
 .project-upload form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   align-items: end;
 }
-
 .project-upload__field {
   display: flex;
   flex-direction: column;
@@ -359,7 +321,6 @@ body {
   font-weight: 600;
   color: #333;
 }
-
 .project-upload__field input,
 .project-upload__field select {
   border-radius: 12px;
@@ -367,7 +328,6 @@ body {
   padding: 0.55rem 0.75rem;
   font-size: 0.95rem;
 }
-
 .project-upload button {
   appearance: none;
   border: none;
@@ -379,11 +339,9 @@ body {
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
-
 .project-upload button:hover {
   opacity: 0.85;
 }
-
 .project-upload__status {
   grid-column: 1 / -1;
   margin: 0;
@@ -391,7 +349,6 @@ body {
   color: #6b6b6b;
 }
 
-/* 모달 (상세보기) */
 .project-modal {
   position: fixed;
   inset: 0;
@@ -400,7 +357,6 @@ body {
   align-items: center;
   justify-content: center;
 }
-
 .project-modal[hidden] {
   display: none;
 }
@@ -411,7 +367,6 @@ body {
   background: rgba(15, 15, 17, 0.6);
   backdrop-filter: blur(10px);
 }
-
 .project-modal-dialog {
   position: relative;
   z-index: 1;
@@ -425,7 +380,6 @@ body {
   grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.2fr);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
 }
-
 .project-modal-image-wrap {
   background: radial-gradient(circle at top, #1f1f23, #050507);
   display: flex;
@@ -433,7 +387,6 @@ body {
   justify-content: center;
   padding: 24px;
 }
-
 .project-modal-image {
   max-width: 100%;
   max-height: 100%;
@@ -448,26 +401,22 @@ body {
   flex-direction: column;
   gap: 12px;
 }
-
 .project-modal-title {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
 }
-
 .project-modal-meta {
   margin: 0;
   font-size: 0.85rem;
   color: #a1a1aa;
 }
-
 .project-modal-link {
   margin-top: 8px;
   font-size: 0.85rem;
   color: #61a4ff;
   text-decoration: none;
 }
-
 .project-modal-link:hover {
   text-decoration: underline;
 }
@@ -485,23 +434,19 @@ body {
   transition: opacity 0.15s ease;
   z-index: 2;
 }
-
 .project-modal-close:hover {
   opacity: 1;
 }
 
-/* 모달 열릴 때 바디 스크롤 막기 */
 body.project-modal-open {
   overflow: hidden;
 }
 
-/* 반응형 */
 @media (max-width: 960px) {
   .aside-form {
     flex-direction: column;
     gap: 32px;
   }
-
   .project-filter {
     width: 100%;
   }
@@ -511,11 +456,9 @@ body.project-modal-open {
     flex-wrap: wrap;
     gap: 8px 16px;
   }
-
   .filter-item {
     font-size: 0.85rem;
   }
-
   .grid-wrap {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -524,7 +467,6 @@ body.project-modal-open {
     grid-template-columns: 1fr;
     max-height: calc(100vh - 40px);
   }
-
   .project-modal-image-wrap {
     padding-bottom: 16px;
   }
@@ -534,19 +476,16 @@ body.project-modal-open {
   .grid-wrap {
     grid-template-columns: 1fr;
   }
-
   .content-filter {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-
   .content-filter-right {
     width: 100%;
     justify-content: flex-start;
     flex-wrap: wrap;
   }
-
   .search-box {
     flex: 1;
   }

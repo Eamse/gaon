@@ -1,3 +1,4 @@
+/** 네이버 지도를 초기화하고 지정된 위치에 마커를 표시합니다. */
 function initMap() {
   const location = new naver.maps.LatLng(37.36231749140221, 126.9210837224447); // 군포시 금정 좌표
   const map = new naver.maps.Map('map', {
@@ -21,14 +22,12 @@ function initMap() {
 }
 initMap();
 
-// 2. 주소 복사 기능
 document.addEventListener('DOMContentLoaded', () => {
   const copyBtn = document.querySelector('.copy-btn');
   const addressText = '경기도 군포시 산본동 1148'; // 복사될 실제 텍스트
 
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
-      // 클립보드에 텍스트 복사
       navigator.clipboard
         .writeText(addressText)
         .then(() => {
@@ -42,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 토스트 메시지 함수
+/** 화면 하단에 잠시 나타나는 토스트 메시지를 표시합니다. */
 function showToast(message) {
   const toast = document.getElementById('copyToast');
   if (toast) {

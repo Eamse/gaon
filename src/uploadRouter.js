@@ -12,23 +12,16 @@ import { protect } from './auth.js';
 
 const router = Router();
 
-// ---------------------------
-// PATH & 디렉터리 설정
-// ---------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.join(__dirname, '..');
 const UPLOAD_ROOT = path.join(ROOT_DIR, 'uploads');
 
-// 임시/백업용 로컬 디렉터리 (원본 + 리사이즈 결과 저장)
 const DIR_ORIGINAL = path.join(UPLOAD_ROOT, 'original');
 const DIR_LARGE = path.join(UPLOAD_ROOT, 'large');
 const DIR_MEDIUM = path.join(UPLOAD_ROOT, 'medium');
 const DIR_THUMB = path.join(UPLOAD_ROOT, 'thumb');
 
-// ---------------------------
-// 업로드 제약 & 유틸리티
-// ---------------------------
 const ALLOWED_MIMES = [
   'image/jpeg',
   'image/png',
@@ -41,6 +34,7 @@ const ALLOWED_MIMES = [
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 const MAX_MULTI_FILES = 10;
 
+/** 파일명을 URL 및 파일 시스템에 안전한 형태로 변환합니다. */
 const sanitizeFilename = (name) =>
   name
     .normalize('NFKD')
@@ -50,6 +44,7 @@ const sanitizeFilename = (name) =>
     .replace(/^_|_$/g, '')
     .slice(0, 80) || 'upload';
 
+/** 원본 파일명을 기반으로 고유한 새 파일명을 생성합니다. */
 const buildFilename = (originalName) => {
   const extCandidate = path.extname(originalName || '').toLowerCase();
   const allowedExts = [
@@ -67,9 +62,7 @@ const buildFilename = (originalName) => {
   return `${suffix}-${base}${ext}`.toLowerCase();
 };
 
-// ---------------------------
-// Multer (원본 파일을 DIR_ORIGINAL에 저장)
-// ---------------------------
+/** 원본 파일을 임시 디렉터리에 저장하는 Multer 저장소 설정을 정의합니다. */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, DIR_ORIGINAL),
   filename: (req, file, cb) => cb(null, buildFilename(file.originalname)),
@@ -84,18 +77,17 @@ const upload = multer({
       return cb(null, true);
     }
     const err = new Error(
-      '지원하지 않는 파일 형식입니다. (jpeg/png/webp/gif/heic/heif)'
+      '지원하지 않는 파일 형식입니다. (jpeg/png/webp/gif/heic/heif)',
     );
     err.status = 400;
     return cb(err);
   },
 });
 
-// ---------------------------
-// Sharp 리사이즈 + 로컬 파일 생성
-// ---------------------------
+/** 이미지 품질 값을 1과 100 사이로 제한합니다. */
 const clampQuality = (quality) => Math.min(100, Math.max(1, quality));
 
+/** Sharp 파이프라인에 이미지 포맷과 품질 설정을 적용합니다. */
 const applyFormat = (pipeline, format, quality) => {
   const q = clampQuality(quality);
   if (format === 'png') {
@@ -116,6 +108,7 @@ const applyFormat = (pipeline, format, quality) => {
   return pipeline;
 };
 
+/** 원본 이미지로부터 여러 크기의 리사이즈된 이미지를 생성하여 디스크에 저장합니다. */
 const generateSizesToDisk = async (sourcePath, filename) => {
   const format = path.extname(filename).replace('.', '').toLowerCase();
   const baseImage = sharp(sourcePath, { failOnError: false }).rotate();
@@ -133,9 +126,9 @@ const generateSizesToDisk = async (sourcePath, filename) => {
           .clone()
           .resize({ width, fit: 'inside', withoutEnlargement: true }),
         format,
-        quality
-      ).toFile(path.join(dir, filename))
-    )
+        quality,
+      ).toFile(path.join(dir, filename)),
+    ),
   );
 
   return {
@@ -146,11 +139,7 @@ const generateSizesToDisk = async (sourcePath, filename) => {
   };
 };
 
-// ---------------------------
-// 업로드 라우트
-//  - POST /api/projects/:projectId/images
-//  - form-data: files[] (다중 업로드)
-// ---------------------------
+/** 특정 프로젝트에 대한 이미지(대표, 상세)들을 업로드합니다. */
 router.post(
   '/projects/:projectId/images',
   protect,
@@ -174,7 +163,6 @@ router.post(
         throw error;
       }
 
-      // upload.fields를 사용하면 req.files는 객체가 됩니다. 모든 파일을 하나의 배열로 합칩니다.
       const fileList = [
         ...(req.files && req.files.files ? req.files.files : []),
         ...(req.files && req.files.mainImageFile
@@ -186,7 +174,14 @@ router.post(
       ];
 
       console.log('  - fileList.length:', fileList.length);
-      console.log('  - fileList:', fileList.map(f => ({ filename: f.filename, size: f.size, mimetype: f.mimetype })));
+      console.log(
+        '  - fileList:',
+        fileList.map((f) => ({
+          filename: f.filename,
+          size: f.size,
+          mimetype: f.mimetype,
+        })),
+      );
 
       if (fileList.length === 0) {
         console.error('❌ 업로드된 파일이 없습니다!');
@@ -216,17 +211,17 @@ router.post(
           uploadFileToR2(
             largePath,
             `projects/${projectId}/large/${file.filename}`,
-            contentType
+            contentType,
           ),
           uploadFileToR2(
             mediumPath,
             `projects/${projectId}/medium/${file.filename}`,
-            contentType
+            contentType,
           ),
           uploadFileToR2(
             thumbPath,
             `projects/${projectId}/thumb/${file.filename}`,
-            contentType
+            contentType,
           ),
         ]);
 
@@ -258,7 +253,6 @@ router.post(
         });
       }
 
-      // 로컬 파일 삭제 (R2에 업로드했으므로 로컬은 임시)
       await Promise.all(
         fileList.map((file) => {
           const filename = file.filename;
@@ -268,20 +262,24 @@ router.post(
             path.join(DIR_MEDIUM, filename),
             path.join(DIR_THUMB, filename),
           ];
-          return Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
-        })
+          return Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
+        }),
       );
 
-      console.log('✅ [/projects/:projectId/images] 업로드 완료:', results.length, '개 파일');
+      console.log(
+        '✅ [/projects/:projectId/images] 업로드 완료:',
+        results.length,
+        '개 파일',
+      );
       return res.json({ ok: true, count: results.length, items: results });
     } catch (error) {
       console.error('❌ [/projects/:projectId/images] 에러:', error.message);
       return next(error);
     }
-  }
+  },
 );
 
-// 📌 프로젝트별 이미지 목록 조회 (GET)
+/** 특정 프로젝트에 속한 모든 이미지 목록을 조회합니다. */
 router.get('/projects/:projectId/images', async (req, res, next) => {
   try {
     const projectId = Number(req.params.projectId);
@@ -291,9 +289,6 @@ router.get('/projects/:projectId/images', async (req, res, next) => {
       throw error;
     }
 
-    // AdminImage와 연결된 AdminGalleryImage도 함께 가져오도록 include 추가
-    // ProjectImage는 AdminGalleryImage와 직접적인 관계가 없으므로 include 하지 않음
-    // AdminImage 모델에 galleryImages 관계가 있으므로, AdminImage 조회 시 함께 가져옴
     const images = await prisma.projectImage.findMany({
       where: { projectId },
       orderBy: { createdAt: 'desc' },
@@ -309,7 +304,7 @@ router.get('/projects/:projectId/images', async (req, res, next) => {
   }
 });
 
-// 📌 프로젝트 이미지 삭제 (DELETE /api/projects/images/:id)
+/** ID를 기준으로 특정 프로젝트 이미지를 R2와 DB에서 삭제합니다. */
 router.delete('/projects/images/:id', protect, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -329,14 +324,10 @@ router.delete('/projects/images/:id', protect, async (req, res, next) => {
       throw error;
     }
 
-    // R2에서 파일 삭제
     const urls = [image.originalUrl, image.thumbUrl].filter(Boolean);
-    // large/medium 등 파생 이미지도 있다면 삭제해야 함 (URL 규칙에 따라 추론하거나 DB에 저장 필요)
-    // 현재 DB에는 original/thumb만 저장 중이므로 이들만 삭제 시도
 
     await Promise.all(urls.map((url) => deleteFileFromR2(url)));
 
-    // DB에서 레코드 삭제
     await prisma.projectImage.delete({
       where: { id },
     });
@@ -347,11 +338,7 @@ router.delete('/projects/images/:id', protect, async (req, res, next) => {
   }
 });
 
-// ---------------------------
-// 어드민 전용: AdminImage 관리 (대표 이미지)
-// ---------------------------
-
-// 📌 어드민: 단일 AdminImage 업로드
+/** 관리자용으로 단일 이미지를 업로드하고 DB에 기록합니다. */
 router.post(
   '/uploads',
   protect,
@@ -367,32 +354,29 @@ router.post(
       const file = req.file;
       const originalPath = path.join(DIR_ORIGINAL, file.filename);
       await generateSizesToDisk(originalPath, file.filename); // 로컬에 리사이즈된 이미지 생성
-
       const meta = await sharp(originalPath, { failOnError: false }).metadata();
 
-      // R2에 업로드
       const contentType = file.mimetype || 'image/jpeg';
-      // AdminImage는 filename을 키로 사용
       const [originalR2, largeR2, mediumR2, thumbR2] = await Promise.all([
         uploadFileToR2(
           originalPath,
           `uploads/original/${file.filename}`,
-          contentType
+          contentType,
         ),
         uploadFileToR2(
           path.join(DIR_LARGE, file.filename),
           `uploads/large/${file.filename}`,
-          contentType
+          contentType,
         ),
         uploadFileToR2(
           path.join(DIR_MEDIUM, file.filename),
           `uploads/medium/${file.filename}`,
-          contentType
+          contentType,
         ),
         uploadFileToR2(
           path.join(DIR_THUMB, file.filename),
           `uploads/thumb/${file.filename}`,
-          contentType
+          contentType,
         ),
       ]);
 
@@ -411,23 +395,22 @@ router.post(
         },
       });
 
-      // 로컬 파일 삭제 (R2에 업로드했으므로 로컬은 임시)
       const targets = [
         path.join(DIR_ORIGINAL, file.filename),
         path.join(DIR_LARGE, file.filename),
         path.join(DIR_MEDIUM, file.filename),
         path.join(DIR_THUMB, file.filename),
       ];
-      await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
+      await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
 
       return res.status(201).json({ ok: true, item: imageRecord });
     } catch (error) {
       return next(error);
     }
-  }
+  },
 );
 
-// 📌 어드민: 다중 AdminImage 업로드
+/** 관리자용으로 여러 이미지를 동시에 업로드하고 DB에 기록합니다. */
 router.post(
   '/uploads-multi',
   protect,
@@ -445,37 +428,38 @@ router.post(
         const originalPath = path.join(DIR_ORIGINAL, file.filename);
         await generateSizesToDisk(originalPath, file.filename); // 로컬에 리사이즈된 이미지 생성
 
-        const meta = await sharp(originalPath, { failOnError: false }).metadata();
+        const meta = await sharp(originalPath, {
+          failOnError: false,
+        }).metadata();
 
-        // R2에 업로드
         const contentType = file.mimetype || 'image/jpeg';
         const [originalR2, largeR2, mediumR2, thumbR2] = await Promise.all([
           uploadFileToR2(
             originalPath,
             `uploads/original/${file.filename}`,
-            contentType
+            contentType,
           ),
           uploadFileToR2(
             path.join(DIR_LARGE, file.filename),
             `uploads/large/${file.filename}`,
-            contentType
+            contentType,
           ),
           uploadFileToR2(
             path.join(DIR_MEDIUM, file.filename),
             `uploads/medium/${file.filename}`,
-            contentType
+            contentType,
           ),
           uploadFileToR2(
             path.join(DIR_THUMB, file.filename),
             `uploads/thumb/${file.filename}`,
-            contentType
+            contentType,
           ),
         ]);
 
         const imageRecord = await prisma.adminImage.create({
           data: {
             filename: file.filename,
-            title: '', // 다중 업로드는 제목/카테고리 비움
+            title: '',
             category: '',
             sizeBytes: file.size,
             width: meta.width ?? null,
@@ -488,14 +472,13 @@ router.post(
         });
         results.push(imageRecord);
 
-        // 로컬 파일 삭제 (R2에 업로드했으므로 로컬은 임시)
         const targets = [
           path.join(DIR_ORIGINAL, file.filename),
           path.join(DIR_LARGE, file.filename),
           path.join(DIR_MEDIUM, file.filename),
           path.join(DIR_THUMB, file.filename),
         ];
-        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
+        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
       }
 
       return res
@@ -504,16 +487,16 @@ router.post(
     } catch (error) {
       return next(error);
     }
-  }
+  },
 );
 
-// 📌 어드민: 단일 AdminImage 정보 조회 (갤러리 이미지 포함)
+/** 파일명을 기준으로 단일 관리자 이미지 정보를 조회합니다. */
 router.get('/uploads/:name', async (req, res, next) => {
   try {
     const { name } = req.params;
     const image = await prisma.adminImage.findUnique({
       where: { filename: name },
-      include: { galleryImages: { orderBy: { order: 'asc' } } }, // 갤러리 이미지 함께 가져오기
+      include: { galleryImages: { orderBy: { order: 'asc' } } },
     });
 
     if (!image) {
@@ -528,7 +511,7 @@ router.get('/uploads/:name', async (req, res, next) => {
   }
 });
 
-// 📌 어드민: AdminImage 목록 조회 (갤러리 이미지 포함)
+/** 필터링 및 페이지네이션을 적용하여 관리자 이미지 목록을 조회합니다. */
 router.get('/uploads', async (req, res, next) => {
   try {
     const q = (req.query.q || '').toString().trim().toLowerCase();
@@ -559,7 +542,7 @@ router.get('/uploads', async (req, res, next) => {
         orderBy,
         take: limit,
         skip,
-        include: { galleryImages: { orderBy: { order: 'asc' } } }, // 갤러리 이미지 함께 가져오기
+        include: { galleryImages: { orderBy: { order: 'asc' } } },
       }),
     ]);
 
@@ -576,7 +559,7 @@ router.get('/uploads', async (req, res, next) => {
   }
 });
 
-// 📌 어드민: AdminImage 정보 수정
+/** 파일명을 기준으로 관리자 이미지의 제목과 카테고리를 수정합니다. */
 router.patch('/uploads/:name', protect, async (req, res, next) => {
   try {
     const { name } = req.params;
@@ -599,7 +582,6 @@ router.patch('/uploads/:name', protect, async (req, res, next) => {
 
     return res.json({ ok: true, item: updatedImage });
   } catch (error) {
-    // Prisma의 update는 레코드가 없으면 에러를 던집니다.
     if (error.code === 'P2025') {
       const error = new Error('파일을 찾을 수 없습니다.');
       error.status = 404;
@@ -609,7 +591,7 @@ router.patch('/uploads/:name', protect, async (req, res, next) => {
   }
 });
 
-// 📌 어드민: AdminImage 삭제 (연결된 갤러리 이미지 파일도 함께 삭제)
+/** 파일명을 기준으로 관리자 이미지와 연결된 모든 파일 및 데이터를 삭제합니다. */
 router.delete('/uploads/:name', protect, async (req, res, next) => {
   try {
     const { name } = req.params;
@@ -625,28 +607,24 @@ router.delete('/uploads/:name', protect, async (req, res, next) => {
       throw error;
     }
 
-    // 1. R2에서 AdminImage 관련 파일 삭제
     const adminImageUrls = [
       adminImage.originalUrl,
       adminImage.largeUrl,
       adminImage.mediumUrl,
       adminImage.thumbUrl,
-    ].filter(Boolean); // null이 아닌 URL만 필터링
+    ].filter(Boolean);
     await Promise.all(adminImageUrls.map((url) => deleteFileFromR2(url)));
 
-    // 2. R2에서 연결된 AdminGalleryImage 관련 파일 삭제
     const galleryImageUrls = adminImage.galleryImages.flatMap((gImage) =>
       [
         gImage.originalUrl,
         gImage.largeUrl,
         gImage.mediumUrl,
         gImage.thumbUrl,
-      ].filter(Boolean)
-    ); // null이 아닌 URL만 필터링
+      ].filter(Boolean),
+    );
     await Promise.all(galleryImageUrls.map((url) => deleteFileFromR2(url)));
 
-    // 3. DB에서 AdminImage 및 연결된 AdminGalleryImage 레코드 삭제
-    // onDelete: Cascade 설정 덕분에 AdminImage 삭제 시 AdminGalleryImage는 자동으로 삭제됨
     await prisma.adminImage.delete({
       where: { filename: name },
     });
@@ -657,11 +635,7 @@ router.delete('/uploads/:name', protect, async (req, res, next) => {
   }
 });
 
-// ---------------------------
-// 어드민 전용: AdminGalleryImage 관리 (상세 이미지)
-// ---------------------------
-
-// 📌 어드민: 특정 AdminImage에 상세 이미지 업로드
+/** 특정 관리자 이미지에 속하는 상세 갤러리 이미지를 업로드합니다. */
 router.post(
   '/uploads/:filename/gallery',
   protect,
@@ -690,17 +664,16 @@ router.post(
         const originalPath = path.join(DIR_ORIGINAL, file.filename);
         await generateSizesToDisk(originalPath, file.filename); // 로컬에 리사이즈된 이미지 생성
 
-        const meta = await sharp(originalPath, { failOnError: false }).metadata();
-
-        // AdminGalleryImage는 id를 파일명에 포함시키기 위해 먼저 생성하고 id를 얻어옴
-        // R2 키는 AdminImage의 id와 AdminGalleryImage의 id를 조합하여 고유하게 만듭니다.
+        const meta = await sharp(originalPath, {
+          failOnError: false,
+        }).metadata();
         const fileExtension = extname(file.originalname);
 
         const tempGalleryImage = await prisma.adminGalleryImage.create({
           data: {
             adminImageId: adminImage.id,
-            alt: req.body.alt || '', // 상세 이미지별 alt 텍스트
-            order: Number(req.body.order) || 0, // 순서
+            alt: req.body.alt || '',
+            order: Number(req.body.order) || 0,
             originalUrl: '', // 임시로 비워둠
             largeUrl: '',
             mediumUrl: '',
@@ -715,22 +688,22 @@ router.post(
           uploadFileToR2(
             originalPath,
             `${baseGalleryKey}${fileExtension}`,
-            file.mimetype
+            file.mimetype,
           ),
           uploadFileToR2(
             path.join(DIR_LARGE, file.filename),
             `${baseGalleryKey}_large${fileExtension}`,
-            file.mimetype
+            file.mimetype,
           ),
           uploadFileToR2(
             path.join(DIR_MEDIUM, file.filename),
             `${baseGalleryKey}_medium${fileExtension}`,
-            file.mimetype
+            file.mimetype,
           ),
           uploadFileToR2(
             path.join(DIR_THUMB, file.filename),
             `${baseGalleryKey}_thumb${fileExtension}`,
-            file.mimetype
+            file.mimetype,
           ),
         ]);
 
@@ -747,19 +720,17 @@ router.post(
           },
         });
 
-        // 🔍 디버깅 로그 추가
         console.log('[DEBUG] updatedGalleryImage:', updatedGalleryImage);
 
         results.push(updatedGalleryImage);
 
-        // 로컬 파일 삭제 (R2에 업로드했으므로 로컬은 임시)
         const targets = [
           path.join(DIR_ORIGINAL, file.filename),
           path.join(DIR_LARGE, file.filename),
           path.join(DIR_MEDIUM, file.filename),
           path.join(DIR_THUMB, file.filename),
         ];
-        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => { })));
+        await Promise.all(targets.map((p) => fsp.unlink(p).catch(() => {})));
       }
 
       return res
@@ -768,10 +739,10 @@ router.post(
     } catch (error) {
       return next(error);
     }
-  }
+  },
 );
 
-// 📌 어드민: 상세 이미지 정보 수정
+/** ID를 기준으로 상세 갤러리 이미지의 alt 텍스트와 순서를 수정합니다. */
 router.patch('/uploads/gallery/:id', protect, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -808,7 +779,7 @@ router.patch('/uploads/gallery/:id', protect, async (req, res, next) => {
   }
 });
 
-// 📌 어드민: 상세 이미지 삭제
+/** ID를 기준으로 상세 갤러리 이미지를 R2와 DB에서 삭제합니다. */
 router.delete('/uploads/gallery/:id', protect, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -828,16 +799,14 @@ router.delete('/uploads/gallery/:id', protect, async (req, res, next) => {
       throw error;
     }
 
-    // R2에서 상세 이미지 관련 파일 삭제
     const galleryImageUrls = [
       galleryImage.originalUrl,
       galleryImage.largeUrl,
       galleryImage.mediumUrl,
       galleryImage.thumbUrl,
-    ].filter(Boolean); // null이 아닌 URL만 필터링
+    ].filter(Boolean);
     await Promise.all(galleryImageUrls.map((url) => deleteFileFromR2(url)));
 
-    // DB에서 상세 이미지 레코드 삭제
     await prisma.adminGalleryImage.delete({
       where: { id },
     });
